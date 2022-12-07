@@ -1,0 +1,15 @@
+Contract WrappedAlph(mut wrappedAmount: U256) {
+  @using(preapprovedAssets = true, assetsInContract = true)
+  pub fn deposit(sender: Address, amount: U256) -> () {
+    transferAlphToSelf!(sender, amount)
+    transferTokenFromSelf!(sender, selfTokenId!(), amount)
+    wrappedAmount = wrappedAmount + amount
+  }
+
+  @using(preapprovedAssets = true, assetsInContract = true)
+  pub fn withdraw(sender: Address, amount: U256) -> () {
+    transferAlphFromSelf!(sender, amount)
+    transferTokenToSelf!(sender, selfTokenId!(), amount)
+    wrappedAmount = wrappedAmount - amount
+  }
+}

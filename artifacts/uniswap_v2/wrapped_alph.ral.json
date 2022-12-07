@@ -1,0 +1,58 @@
+{
+  "version": "v1.5.4",
+  "name": "WrappedAlph",
+  "bytecode": "010218403001010202000b16001601a91600b11601aba00016012aa10001010202000b16001601a81600b11601aca00016012ba100",
+  "codeHash": "489d088712087e7dbdd9c2aa8576a73aee9874281ef7f79e78e2cb2932bf534a",
+  "fieldsSig": {
+    "names": [
+      "wrappedAmount"
+    ],
+    "types": [
+      "U256"
+    ],
+    "isMutable": [
+      true
+    ]
+  },
+  "eventsSig": [],
+  "functions": [
+    {
+      "name": "deposit",
+      "usePreapprovedAssets": true,
+      "useAssetsInContract": true,
+      "isPublic": true,
+      "paramNames": [
+        "sender",
+        "amount"
+      ],
+      "paramTypes": [
+        "Address",
+        "U256"
+      ],
+      "paramIsMutable": [
+        false,
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "withdraw",
+      "usePreapprovedAssets": true,
+      "useAssetsInContract": true,
+      "isPublic": true,
+      "paramNames": [
+        "sender",
+        "amount"
+      ],
+      "paramTypes": [
+        "Address",
+        "U256"
+      ],
+      "paramIsMutable": [
+        false,
+        false
+      ],
+      "returnTypes": []
+    }
+  ]
+}

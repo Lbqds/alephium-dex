@@ -26,6 +26,12 @@
       "codeHashDebug": "d2f6c1e3053cd5df4868fc9c5930341441f52aa07298fc33ec13809abc30d66a",
       "warnings": []
     },
+    "contracts/uniswap_v2/wrapped_alph.ral": {
+      "sourceCodeHash": "3b4e54098ff9ad7abce9b814b49eb02e53c611b508d848e7af5196fbd811524f",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "489d088712087e7dbdd9c2aa8576a73aee9874281ef7f79e78e2cb2932bf534a",
+      "warnings": []
+    },
     "contracts/uniswap_v2/constants.ral": {
       "sourceCodeHash": "02effaa427e3bfb09e1e1dc966d1434b6730169113b95c653be3112e21ab8e26",
       "bytecodeDebugPatch": "",
