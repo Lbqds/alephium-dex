@@ -1,0 +1,54 @@
+{
+  "compilerOptionsUsed": {
+    "ignoreUnusedConstantsWarnings": true,
+    "ignoreUnusedVariablesWarnings": false,
+    "ignoreUnusedFieldsWarnings": false,
+    "ignoreUnusedPrivateFunctionsWarnings": false,
+    "ignoreUpdateFieldsCheckWarnings": false,
+    "ignoreExternalCallCheckWarnings": false
+  },
+  "infos": {
+    "contracts/test/flash_swap_test.ral": {
+      "sourceCodeHash": "fc429b3554cce278d11486afd3755bdf507faa82a3f8fde948960ff2d5be0fb4",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "2201e44be4a8727e290953a92cf29bec20cacc4cd63bf2c3e60d8de4cbb560cf",
+      "warnings": []
+    },
+    "contracts/test/math_test.ral": {
+      "sourceCodeHash": "7f307735569bf071f47a34a3abfe87c9529c53890765d90c1aabf6bdb8494a81",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "3489cfa265232dabdd8a91ebcf0889b8a48ebb6e01a3fc043f1b0e6d9440aab0",
+      "warnings": []
+    },
+    "contracts/uniswap_v2/uniswap_v2_factory.ral": {
+      "sourceCodeHash": "da775e18c6ac94e5796986cd30ac6325fc24dd8aff0c50d5a0652d878e1d7dad",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "4860016db52fbcfb5a16229f8a2dec38d06f5a26661340a53b1a13229c9c249c",
+      "warnings": []
+    },
+    "contracts/uniswap_v2/uniswap_v2_pair.ral": {
+      "sourceCodeHash": "41f800a9685bb40018ab8f85b20910f0420d8dc5972c5ed832fafffe67cc2941",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "96b903f9e5a80b466999c6d798136f494290b473342bf9c61d4da3c5ee78e9c0",
+      "warnings": []
+    },
+    "contracts/uniswap_v2/constants.ral": {
+      "sourceCodeHash": "02effaa427e3bfb09e1e1dc966d1434b6730169113b95c653be3112e21ab8e26",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "",
+      "warnings": []
+    },
+    "contracts/uniswap_v2/math.ral": {
+      "sourceCodeHash": "85ccb79713649c5629ac3a0d863069329789f5df2afbb131fbae6af5dc73e401",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "",
+      "warnings": []
+    },
+    "contracts/uniswap_v2/uniswap_v2_callee.ral": {
+      "sourceCodeHash": "ec1e961edd66db3db1fecf15595c4966bb43514213d5939a579623dfb489c2f4",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "",
+      "warnings": []
+    }
+  }
+}

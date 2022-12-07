@@ -1,0 +1,16 @@
+Abstract Contract Constants() {
+  enum ErrorCodes {
+    ReserveOverflow             = 0
+    InsufficientInitLiquidity   = 1
+    InsufficientLiquidityMinted = 2
+    InsufficientLiquidityBurned = 3
+    InvalidToAddress            = 4
+    InsufficientLiquidity       = 5
+    InvalidTokenInId            = 6
+    InvalidCalleeId             = 7
+    InvalidK                    = 8
+    InsufficientOutputAmount    = 9
+    InsufficientInputAmount     = 10
+    IdenticalTokenIds           = 11
+  }
+}

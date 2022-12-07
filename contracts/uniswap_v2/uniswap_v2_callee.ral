@@ -1,0 +1,4 @@
+Interface UniswapV2Callee {
+  @using(preapprovedAssets = true, assetsInContract = true)
+  pub fn uniswapV2Call(amount0: U256, amount1: U256, data: ByteVec) -> ()
+}

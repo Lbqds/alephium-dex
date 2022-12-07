@@ -1,0 +1,287 @@
+{
+  "version": "v1.5.2",
+  "name": "UniswapV2Pair",
+  "bytecode": "080940424054408a409540ff419241e942a0436501000203011213dcffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff16002b170216021601314c06160116022b0d2b02160016012a0201000202010816000d1340703b2c16012d0201000103011f16000f334c191600170116000e2d0d2a170216021601314c0b16021701160016022d16022a0e2d17024a311601020d02010000000203a000a001020000020500403d0d1340700d2b3b1702160016023116011602311a0c7b561343e82d0d13203b2e17031603a0042b170416040c33a0020c331aa0030c331a4c10a003a002000116042ca0050000a105a002a003000116042ca0060000a1061601a1031600a1021603a104010103070040530c1703a0070c2f4c17160116022c0002170416041343e8330d7b16041343e82b1703a0071343e82aa107b2b11343e8bd4a141601a0072ca0022d17051602a0072ca0032d170616051606334c0216064a011605170316030c330e7ba00716032aa1071600b11603aba00216012aa00316022a00041600a0001601ac1600a0011602ac05160016011602160361010102040040321601a0022ca0072d17021601a0032ca0072d170316020c3316030c331a0f7ba00716012ba107a00216022ba00316032b00041600b11601ac1600a0001602ab1600a0011603ab061600160216031601610101040a004069160048107b16030c3313097b1601a000411601a001411b13067b16021343e52c1704a002a0032c1343e82c17051601a000414c40201603a00331117b1343e8a0022c16042a1706a00316032b1707160616072c16053413087b1600a0011603aba00216022a160700044a1f1603a00231117ba00216032b17081343e8a0032c16042a1709160816092c16053413087b1600a0001603ab1608a00316022a0004160016011602ac071600160116021603610102040b00407716010c3316020c331b13097b1600a000421600a001421a13077b16001704b27aa0001601a3a0011602a31601160216030f0c16040100b2a000a51705b2a001a517061605a00216012b334c061605a00216012b2b4a010c17071606a00316022b334c061606a00316022b2b4a010c170816070c3316080c331b130a7b1343e816052c16070f2c2b17091343e816062c16080f2c2b170a1609160a2c1343e81343e82ca0022ca0032c3413087b160516060004081600160716081601160273",
+  "codeHash": "96b903f9e5a80b466999c6d798136f494290b473342bf9c61d4da3c5ee78e9c0",
+  "fieldsSig": {
+    "names": [
+      "token0Id",
+      "token1Id",
+      "reserve0",
+      "reserve1",
+      "blockTimeStampLast",
+      "price0CumulativeLast",
+      "price1CumulativeLast",
+      "totalSupply"
+    ],
+    "types": [
+      "ByteVec",
+      "ByteVec",
+      "U256",
+      "U256",
+      "U256",
+      "U256",
+      "U256",
+      "U256"
+    ],
+    "isMutable": [
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "eventsSig": [
+    {
+      "name": "Mint",
+      "fieldNames": [
+        "sender",
+        "amount0",
+        "amount1",
+        "liquidity"
+      ],
+      "fieldTypes": [
+        "Address",
+        "U256",
+        "U256",
+        "U256"
+      ]
+    },
+    {
+      "name": "Burn",
+      "fieldNames": [
+        "sender",
+        "amount0",
+        "amount1",
+        "liquidity"
+      ],
+      "fieldTypes": [
+        "Address",
+        "U256",
+        "U256",
+        "U256"
+      ]
+    },
+    {
+      "name": "Swap",
+      "fieldNames": [
+        "sender",
+        "tokenInId",
+        "amountIn",
+        "amountOut"
+      ],
+      "fieldTypes": [
+        "Address",
+        "ByteVec",
+        "U256",
+        "U256"
+      ]
+    },
+    {
+      "name": "FlashSwap",
+      "fieldNames": [
+        "contractId",
+        "amount0In",
+        "amount1In",
+        "amount0Out",
+        "amount1Out"
+      ],
+      "fieldTypes": [
+        "ByteVec",
+        "U256",
+        "U256",
+        "U256",
+        "U256"
+      ]
+    }
+  ],
+  "functions": [
+    {
+      "name": "addWithOverflow",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [
+        "a",
+        "b"
+      ],
+      "paramTypes": [
+        "U256",
+        "U256"
+      ],
+      "paramIsMutable": [
+        false,
+        false
+      ],
+      "returnTypes": [
+        "U256"
+      ]
+    },
+    {
+      "name": "uqdiv",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [
+        "a",
+        "b"
+      ],
+      "paramTypes": [
+        "U256",
+        "U256"
+      ],
+      "paramIsMutable": [
+        false,
+        false
+      ],
+      "returnTypes": [
+        "U256"
+      ]
+    },
+    {
+      "name": "sqrt",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [
+        "y"
+      ],
+      "paramTypes": [
+        "U256"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": [
+        "U256"
+      ]
+    },
+    {
+      "name": "getTokenPair",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "ByteVec",
+        "ByteVec"
+      ]
+    },
+    {
+      "name": "update",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": false,
+      "paramNames": [
+        "newReserve0",
+        "newReserve1"
+      ],
+      "paramTypes": [
+        "U256",
+        "U256"
+      ],
+      "paramIsMutable": [
+        false,
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "mint",
+      "usePreapprovedAssets": true,
+      "useAssetsInContract": true,
+      "isPublic": true,
+      "paramNames": [
+        "sender",
+        "amount0",
+        "amount1"
+      ],
+      "paramTypes": [
+        "Address",
+        "U256",
+        "U256"
+      ],
+      "paramIsMutable": [
+        false,
+        false,
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "burn",
+      "usePreapprovedAssets": true,
+      "useAssetsInContract": true,
+      "isPublic": true,
+      "paramNames": [
+        "sender",
+        "liquidity"
+      ],
+      "paramTypes": [
+        "Address",
+        "U256"
+      ],
+      "paramIsMutable": [
+        false,
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "swap",
+      "usePreapprovedAssets": true,
+      "useAssetsInContract": true,
+      "isPublic": true,
+      "paramNames": [
+        "sender",
+        "tokenInId",
+        "amountIn",
+        "amountOut"
+      ],
+      "paramTypes": [
+        "Address",
+        "ByteVec",
+        "U256",
+        "U256"
+      ],
+      "paramIsMutable": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "flashSwap",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": true,
+      "isPublic": true,
+      "paramNames": [
+        "contractId",
+        "amount0Out",
+        "amount1Out",
+        "data"
+      ],
+      "paramTypes": [
+        "ByteVec",
+        "U256",
+        "U256",
+        "ByteVec"
+      ],
+      "paramIsMutable": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "returnTypes": []
+    }
+  ]
+}
