@@ -8,12 +8,6 @@
     "ignoreExternalCallCheckWarnings": false
   },
   "infos": {
-    "contracts/test/flash_swap_test.ral": {
-      "sourceCodeHash": "fc429b3554cce278d11486afd3755bdf507faa82a3f8fde948960ff2d5be0fb4",
-      "bytecodeDebugPatch": "",
-      "codeHashDebug": "2201e44be4a8727e290953a92cf29bec20cacc4cd63bf2c3e60d8de4cbb560cf",
-      "warnings": []
-    },
     "contracts/test/math_test.ral": {
       "sourceCodeHash": "7f307735569bf071f47a34a3abfe87c9529c53890765d90c1aabf6bdb8494a81",
       "bytecodeDebugPatch": "",
@@ -27,9 +21,9 @@
       "warnings": []
     },
     "contracts/uniswap_v2/uniswap_v2_pair.ral": {
-      "sourceCodeHash": "41f800a9685bb40018ab8f85b20910f0420d8dc5972c5ed832fafffe67cc2941",
+      "sourceCodeHash": "7295cb4cad22a623066740c636ee203f106dce99feb2fb451a49df4aff90cf91",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "96b903f9e5a80b466999c6d798136f494290b473342bf9c61d4da3c5ee78e9c0",
+      "codeHashDebug": "d2f6c1e3053cd5df4868fc9c5930341441f52aa07298fc33ec13809abc30d66a",
       "warnings": []
     },
     "contracts/uniswap_v2/constants.ral": {

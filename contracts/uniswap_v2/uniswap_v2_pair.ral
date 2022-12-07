@@ -110,31 +110,4 @@ Contract UniswapV2Pair(
     transferTokenToSelf!(sender, tokenInId, amountIn)
     emit Swap(sender, tokenInId, amountIn, amountOut)
   }
-
-  @using(assetsInContract = true)
-  pub fn flashSwap(
-    contractId: ByteVec,
-    amount0Out: U256,
-    amount1Out: U256,
-    data: ByteVec
-  ) -> () {
-    assert!(amount0Out > 0 || amount1Out > 0, ErrorCodes.InsufficientOutputAmount)
-    assert!(contractId != token0Id && contractId != token1Id, ErrorCodes.InvalidCalleeId)
-
-    let callee = UniswapV2Callee(contractId)
-    callee.uniswapV2Call{selfAddress!() -> token0Id: amount0Out, token1Id: amount1Out}(amount0Out, amount1Out, data)
-    let newReserve0 = tokenRemaining!(selfAddress!(), token0Id)
-    let newReserve1 = tokenRemaining!(selfAddress!(), token1Id)
-    let amount0In = if (newReserve0 > reserve0 - amount0Out) newReserve0 - (reserve0 - amount0Out) else 0
-    let amount1In = if (newReserve1 > reserve1 - amount1Out) newReserve1 - (reserve1 - amount1Out) else 0
-    assert!(amount0In > 0 || amount1In > 0, ErrorCodes.InsufficientInputAmount)
-
-    let newReserve0Adjusted = 1000 * newReserve0 - amount0In * 3
-    let newReserve1Adjusted = 1000 * newReserve1 - amount1In * 3
-    assert!(newReserve0Adjusted * newReserve1Adjusted >= 1000 * 1000 * reserve0 * reserve1, ErrorCodes.InvalidK)
-
-    update(newReserve0, newReserve1)
-
-    emit FlashSwap(contractId, amount0In, amount1In, amount0Out, amount1Out)
-  }
 }

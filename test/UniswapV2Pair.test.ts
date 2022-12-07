@@ -1,18 +1,15 @@
-import { Asset, Fields, Number256, Project, Token, web3 } from '@alephium/web3'
+import { Asset, Fields, Number256, Token, web3 } from '@alephium/web3'
 import {
-  bigintToHex,
   buildProject,
   ContractInfo,
   createUniswapV2Pair,
   oneAlph,
-  randomContractAddress,
   randomP2PKHAddress,
   randomTokenId,
-  randomTokenPair,
-  subContractIdWithGroup
+  randomTokenPair
 } from './fixtures/UniswapFixture'
 import BigNumber from 'bignumber.js'
-import { expectAssertionError, randomContractId } from '@alephium/web3-test'
+import { expectAssertionError } from '@alephium/web3-test'
 
 const MinimumLiquidity = 1000n
 
@@ -323,124 +320,5 @@ describe('test uniswap v2 pair', () => {
     const expectedAmountOut1 = getAmountOut(amountIn1, reserve1, reserve0)
     await testSwap(token1Id, amountIn1, expectedAmountOut1)
     await expectAssertionError(testSwap(token1Id, amountIn1, expectedAmountOut1 + 1n), contractInfo.address, 8)
-  }, 20000)
-
-  test('flashSwap', async () => {
-    await buildProject()
-
-    const [token0Id, token1Id] = randomTokenPair()
-    const factoryId = randomContractId()
-    const pairContractId = subContractIdWithGroup(factoryId, token0Id + token1Id, 0)
-    const contractInfo = createUniswapV2Pair(token0Id, token1Id, pairContractId)
-    const sender = randomP2PKHAddress()
-
-    function createFlashSwapTest(factoryId: string, tokens: Token[]): ContractInfo {
-      const contract = Project.contract('FlashSwapTest')
-      const address = randomContractAddress()
-      const contractState = contract.toState(
-        { factory: factoryId, callTimes: 0n },
-        { alphAmount: oneAlph, tokens: tokens },
-        address
-      )
-      return new ContractInfo(contract, contractState, [], address)
-    }
-
-    function getAmountIn(amountOut: bigint): bigint {
-      // ((reserveOut - amountOut) + amountIn - amountIn * 0.003) * reserveIn >= reserveOut * reserveIn
-      // amountIn >= 1000 * amountOut / 997
-      const str = BigNumber((1000n * amountOut).toString())
-        .div(BigNumber(997))
-        .toFixed(0, BigNumber.ROUND_UP)
-      return BigInt(str)
-    }
-
-    const { contractState, reserve0, reserve1, totalSupply } = await mint(contractInfo, sender, 100n, 80000n)
-    async function testFlashSwap(
-      amount0Out: bigint,
-      amount0In: bigint,
-      amount1Out: bigint,
-      amount1In: bigint,
-      token0Amount: bigint,
-      token1Amount: bigint
-    ) {
-      const tokens = [
-        { id: token0Id, amount: token0Amount },
-        { id: token1Id, amount: token1Amount }
-      ]
-      const flashSwapTestContractInfo = createFlashSwapTest(factoryId, tokens)
-
-      const data = token0Id + bigintToHex(amount0In) + token1Id + bigintToHex(amount1In)
-      const testResult = await contractInfo.contract.testPublicMethod('flashSwap', {
-        initialFields: contractState.fields,
-        initialAsset: contractState.asset,
-        address: contractInfo.address,
-        existingContracts: contractInfo.dependencies.concat(flashSwapTestContractInfo.states()),
-        testArgs: {
-          contractId: flashSwapTestContractInfo.contractId,
-          amount0Out: amount0Out,
-          amount1Out: amount1Out,
-          data: data
-        }
-      })
-      const pairContractState = testResult.contracts.find((c) => c.contractId === contractInfo.contractId)!
-      expect(pairContractState.fields['reserve0']).toEqual(reserve0 + amount0In - amount0Out)
-      expect(pairContractState.fields['reserve1']).toEqual(reserve1 + amount1In - amount1Out)
-      expect(pairContractState.fields['totalSupply']).toEqual(totalSupply)
-      expectTokensEqual(pairContractState.asset.tokens!, [
-        { id: pairContractId, amount: (1n << 255n) - totalSupply },
-        { id: token0Id, amount: reserve0 + amount0In - amount0Out },
-        { id: token1Id, amount: reserve1 + amount1In - amount1Out }
-      ])
-      expect(testResult.events.length).toEqual(1)
-      expect(testResult.events[0].fields).toEqual({
-        contractId: flashSwapTestContractInfo.contractId,
-        amount0In: amount0In,
-        amount1In: amount1In,
-        amount0Out: amount0Out,
-        amount1Out: amount1Out
-      })
-
-      const flashSwapTestContractState = testResult.contracts.find(
-        (c) => c.contractId === flashSwapTestContractInfo.contractId
-      )!
-      const flashSwapTestContractTokens: Token[] = []
-      const token0Remain = token0Amount + amount0Out - amount0In
-      if (token0Remain > 0) {
-        flashSwapTestContractTokens.push({ id: token0Id, amount: token0Remain })
-      }
-      const token1Remain = token1Amount + amount1Out - amount1In
-      if (token1Remain > 0) {
-        flashSwapTestContractTokens.push({ id: token1Id, amount: token1Remain })
-      }
-      if (flashSwapTestContractState.asset.tokens === undefined) {
-        expect(flashSwapTestContractTokens).toEqual([])
-      } else {
-        expectTokensEqual(flashSwapTestContractState.asset.tokens, flashSwapTestContractTokens)
-      }
-    }
-
-    const amountOut0 = 20n // token0Id
-    const amountIn0 = getAmountIn(amountOut0)
-    await testFlashSwap(amountOut0, amountIn0, 0n, 0n, amountIn0 - amountOut0, 0n)
-    await expectAssertionError(
-      testFlashSwap(amountOut0, amountIn0 - 1n, 0n, 0n, amountIn0 - amountOut0, 0n),
-      contractInfo.address,
-      8
-    )
-    await testFlashSwap(amountOut0, amountIn0 + 1n, 0n, 0n, amountIn0 - amountOut0 + 1n, 0n)
-    await testFlashSwap(amountOut0, amountIn0, 0n, 0n, amountIn0 - amountOut0 + 1n, 0n)
-
-    const amountOut1 = 30000n // token1Id
-    const amountIn1 = getAmountIn(amountOut1)
-    await testFlashSwap(0n, 0n, amountOut1, amountIn1, 0n, amountIn1 - amountOut1)
-    await expectAssertionError(
-      testFlashSwap(0n, 0n, amountOut1, amountIn1 - 1n, 0n, amountIn1 - amountOut1),
-      contractInfo.address,
-      8
-    )
-    await testFlashSwap(0n, 0n, amountOut1, amountIn1 + 1n, 0n, amountIn1 - amountOut1 + 1n)
-    await testFlashSwap(0n, 0n, amountOut1, amountIn1, 0n, amountIn1 - amountOut1 + 1n)
-
-    await testFlashSwap(20n, 21n, 30000n, 31000n, 1n, 1000n)
   }, 20000)
 })
