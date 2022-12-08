@@ -102,8 +102,8 @@ export function createMath(): ContractInfo {
   return new ContractInfo(mathContract, contractState, [], address)
 }
 
-export function createUniswapV2Pair(token0Id: string, token1Id: string, contractId?: string): ContractInfo {
-  const contract = Project.contract('UniswapV2Pair')
+export function createTokenPair(token0Id: string, token1Id: string, contractId?: string): ContractInfo {
+  const contract = Project.contract('TokenPair')
   const address = contractId ? addressFromContractId(contractId) : randomContractAddress()
   const contractState = contract.toState(
     {
@@ -130,10 +130,10 @@ export function createUniswapV2Pair(token0Id: string, token1Id: string, contract
   return new ContractInfo(contract, contractState, [], address)
 }
 
-export function createUniswapV2Factory(): ContractInfo {
-  const pairTemplate = createUniswapV2Pair(randomTokenId(), randomTokenId())
+export function createTokenPairFactory(): ContractInfo {
+  const pairTemplate = createTokenPair(randomTokenId(), randomTokenId())
 
-  const contract = Project.contract('UniswapV2Factory')
+  const contract = Project.contract('TokenPairFactory')
   const address = randomContractAddress()
   const contractState = contract.toState(
     {

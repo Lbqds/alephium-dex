@@ -2,18 +2,18 @@ import { Asset, Fields, Number256, Token, web3 } from '@alephium/web3'
 import {
   buildProject,
   ContractInfo,
-  createUniswapV2Pair,
+  createTokenPair,
   oneAlph,
   randomP2PKHAddress,
   randomTokenId,
   randomTokenPair
-} from './fixtures/UniswapFixture'
+} from './fixtures/DexFixture'
 import BigNumber from 'bignumber.js'
 import { expectAssertionError } from '@alephium/web3-test'
 
 const MinimumLiquidity = 1000n
 
-describe('test uniswap v2 pair', () => {
+describe('test token pair', () => {
   web3.setCurrentNodeProvider('http://127.0.0.1:22973')
 
   function expectTokensEqual(expected: Token[], have: Token[]) {
@@ -99,7 +99,7 @@ describe('test uniswap v2 pair', () => {
     await buildProject()
 
     const [token0Id, token1Id] = randomTokenPair()
-    const contractInfo = createUniswapV2Pair(token0Id, token1Id)
+    const contractInfo = createTokenPair(token0Id, token1Id)
     const sender = randomP2PKHAddress()
 
     async function testMint(amount0: bigint, amount1: bigint, initialFields?: Fields, initialAsset?: Asset) {
@@ -183,7 +183,7 @@ describe('test uniswap v2 pair', () => {
     await buildProject()
 
     const [token0Id, token1Id] = randomTokenPair()
-    const contractInfo = createUniswapV2Pair(token0Id, token1Id)
+    const contractInfo = createTokenPair(token0Id, token1Id)
     const sender = randomP2PKHAddress()
 
     async function testBurn(liquidity: bigint, initialFields?: Fields, initialAsset?: Asset) {
@@ -244,7 +244,7 @@ describe('test uniswap v2 pair', () => {
     await buildProject()
 
     const [token0Id, token1Id] = randomTokenPair()
-    const contractInfo = createUniswapV2Pair(token0Id, token1Id)
+    const contractInfo = createTokenPair(token0Id, token1Id)
     const sender = randomP2PKHAddress()
 
     function getAmountOut(amountIn: bigint, reserveIn: bigint, reserveOut: bigint): bigint {

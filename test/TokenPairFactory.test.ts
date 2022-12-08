@@ -1,21 +1,21 @@
 import { web3 } from '@alephium/web3'
 import {
   buildProject,
-  createUniswapV2Factory,
+  createTokenPairFactory,
   oneAlph,
   randomP2PKHAddress,
   randomTokenId,
   sortTokens,
   subContractIdWithGroup
-} from './fixtures/UniswapFixture'
+} from './fixtures/DexFixture'
 
-describe('test uniswap v2 factory', () => {
+describe('test token pair factory', () => {
   web3.setCurrentNodeProvider('http://127.0.0.1:22973')
 
   test('create pair', async () => {
     await buildProject()
 
-    const contractInfo = createUniswapV2Factory()
+    const contractInfo = createTokenPairFactory()
     const contract = contractInfo.contract
     const tokenAId = randomTokenId()
     const tokenBId = randomTokenId()

@@ -7,7 +7,7 @@ import {
   oneAlph,
   randomBigInt,
   randomP2PKHAddress
-} from './fixtures/UniswapFixture'
+} from './fixtures/DexFixture'
 
 describe('test wrapped alph', () => {
   web3.setCurrentNodeProvider('http://127.0.0.1:22973')

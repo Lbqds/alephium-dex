@@ -1,6 +1,6 @@
 // TODO: do we need to support `feeTo`???
-Contract UniswapV2Factory(
-  pairTemplateId: ByteVec, // the template contract id of `UniswapV2Pair`
+Contract TokenPairFactory(
+  pairTemplateId: ByteVec, // the template contract id of `TokenPair`
   mut pairSize: U256
 ) extends Constants() {
 

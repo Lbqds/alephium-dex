@@ -1,4 +1,4 @@
-Contract UniswapV2Pair(
+Contract TokenPair(
   token0Id: ByteVec,
   token1Id: ByteVec,
   mut reserve0: U256,

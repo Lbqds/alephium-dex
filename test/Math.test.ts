@@ -1,5 +1,5 @@
 import { Number256, web3 } from '@alephium/web3'
-import { buildProject, createMath, randomBigInt } from './fixtures/UniswapFixture'
+import { buildProject, createMath, randomBigInt } from './fixtures/DexFixture'
 import BigNumber from 'bignumber.js'
 
 describe('test math', () => {
