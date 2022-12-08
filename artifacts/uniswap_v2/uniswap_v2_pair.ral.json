@@ -80,23 +80,6 @@
         "U256",
         "U256"
       ]
-    },
-    {
-      "name": "FlashSwap",
-      "fieldNames": [
-        "contractId",
-        "amount0In",
-        "amount1In",
-        "amount0Out",
-        "amount1Out"
-      ],
-      "fieldTypes": [
-        "ByteVec",
-        "U256",
-        "U256",
-        "U256",
-        "U256"
-      ]
     }
   ],
   "functions": [

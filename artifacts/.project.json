@@ -21,7 +21,7 @@
       "warnings": []
     },
     "contracts/uniswap_v2/uniswap_v2_pair.ral": {
-      "sourceCodeHash": "7295cb4cad22a623066740c636ee203f106dce99feb2fb451a49df4aff90cf91",
+      "sourceCodeHash": "94d92089a247b3ea278c98ac13057ff3ebd3dd7fbe4afdc60b8b233b48f1624d",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "d2f6c1e3053cd5df4868fc9c5930341441f52aa07298fc33ec13809abc30d66a",
       "warnings": []
@@ -40,12 +40,6 @@
     },
     "contracts/uniswap_v2/math.ral": {
       "sourceCodeHash": "85ccb79713649c5629ac3a0d863069329789f5df2afbb131fbae6af5dc73e401",
-      "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
-    },
-    "contracts/uniswap_v2/uniswap_v2_callee.ral": {
-      "sourceCodeHash": "ec1e961edd66db3db1fecf15595c4966bb43514213d5939a579623dfb489c2f4",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []

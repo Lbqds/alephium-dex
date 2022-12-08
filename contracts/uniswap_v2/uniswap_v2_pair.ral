@@ -12,7 +12,6 @@ Contract UniswapV2Pair(
   event Mint(sender: Address, amount0: U256, amount1: U256, liquidity: U256)
   event Burn(sender: Address, amount0: U256, amount1: U256, liquidity: U256)
   event Swap(sender: Address, tokenInId: ByteVec, amountIn: U256, amountOut: U256)
-  event FlashSwap(contractId: ByteVec, amount0In: U256, amount1In: U256, amount0Out: U256, amount1Out: U256)
 
   const MINIMUM_LIQUIDITY = 1000
 
