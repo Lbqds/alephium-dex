@@ -16,6 +16,7 @@ export const maxAlphAmount = 10n ** 18n * 1000000000n
 export const gasPrice = 100000000000n
 export const maxGasPerTx = 625000n
 export const defaultGasFee = gasPrice * maxGasPerTx
+export const alphTokenId = ''.padStart(64, '0')
 
 export class ContractInfo {
   contract: Contract
@@ -146,19 +147,4 @@ export function createTokenPairFactory(): ContractInfo {
     address
   )
   return new ContractInfo(contract, contractState, pairTemplate.states(), address)
-}
-
-export function createWrappedAlph(alphAmount: bigint = oneAlph, tokenAmount: bigint = maxAlphAmount): ContractInfo {
-  const contract = Project.contract('WrappedAlph')
-  const address = randomContractAddress()
-  const contractId = binToHex(contractIdFromAddress(address))
-  const contractState = contract.toState(
-    { wrappedAmount: alphAmount - oneAlph },
-    {
-      alphAmount: alphAmount,
-      tokens: [{ id: contractId, amount: tokenAmount }]
-    },
-    address
-  )
-  return new ContractInfo(contract, contractState, [], address)
 }

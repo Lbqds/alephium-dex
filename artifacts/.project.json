@@ -20,12 +20,6 @@
       "codeHashDebug": "4860016db52fbcfb5a16229f8a2dec38d06f5a26661340a53b1a13229c9c249c",
       "warnings": []
     },
-    "contracts/dex/wrapped_alph.ral": {
-      "sourceCodeHash": "3b4e54098ff9ad7abce9b814b49eb02e53c611b508d848e7af5196fbd811524f",
-      "bytecodeDebugPatch": "",
-      "codeHashDebug": "489d088712087e7dbdd9c2aa8576a73aee9874281ef7f79e78e2cb2932bf534a",
-      "warnings": []
-    },
     "contracts/test/math_test.ral": {
       "sourceCodeHash": "7f307735569bf071f47a34a3abfe87c9529c53890765d90c1aabf6bdb8494a81",
       "bytecodeDebugPatch": "",

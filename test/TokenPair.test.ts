@@ -1,8 +1,10 @@
 import { Asset, Fields, Number256, Token, web3 } from '@alephium/web3'
 import {
+  alphTokenId,
   buildProject,
   ContractInfo,
   createTokenPair,
+  defaultGasFee,
   oneAlph,
   randomP2PKHAddress,
   randomTokenId,
@@ -58,16 +60,19 @@ describe('test token pair', () => {
     const token1Id = contractInfo.selfState.fields['token1Id'] as string
     const initFields = initialFields ?? contractInfo.selfState.fields
     const initAsset = initialAsset ?? contractInfo.selfState.asset
+
+    const tokens: Token[] = [{ id: token1Id, amount: amount1 }]
+    let alphAmount: bigint = oneAlph
+    if (token0Id === alphTokenId) {
+      alphAmount += amount0
+    } else {
+      tokens.push({ id: token0Id, amount: amount0 })
+    }
+
     const inputAssets = [
       {
         address: sender,
-        asset: {
-          alphAmount: oneAlph,
-          tokens: [
-            { id: token0Id, amount: amount0 },
-            { id: token1Id, amount: amount1 }
-          ]
-        }
+        asset: { alphAmount: alphAmount, tokens: tokens }
       }
     ]
     const mintResult = await contractInfo.contract.testPublicMethod('mint', {
@@ -98,19 +103,26 @@ describe('test token pair', () => {
   test('mint', async () => {
     await buildProject()
 
-    const [token0Id, token1Id] = randomTokenPair()
-    const contractInfo = createTokenPair(token0Id, token1Id)
     const sender = randomP2PKHAddress()
 
-    async function testMint(amount0: bigint, amount1: bigint, initialFields?: Fields, initialAsset?: Asset) {
+    async function testMint(
+      contractInfo: ContractInfo,
+      amount0: bigint,
+      amount1: bigint,
+      initialFields?: Fields,
+      initialAsset?: Asset
+    ) {
+      const token0Id = contractInfo.selfState.fields['token0Id'] as string
+      const token1Id = contractInfo.selfState.fields['token1Id'] as string
       const initFields = initialFields ?? contractInfo.selfState.fields
+      const initAsset = initialAsset ?? contractInfo.selfState.asset
       const {
         mintResult: testResult,
         contractState,
         reserve0: currentReserve0,
         reserve1: currentReserve1,
         totalSupply: currentTotalSupply
-      } = await mint(contractInfo, sender, amount0, amount1, initialFields, initialAsset)
+      } = await mint(contractInfo, sender, amount0, amount1, initialFields, initAsset)
 
       const previousReserve0 = initFields['reserve0'] as Number256
       const previousReserve1 = initFields['reserve1'] as Number256
@@ -148,11 +160,20 @@ describe('test token pair', () => {
           : calcLiquidity(amount0, amount1, previousReserve0, previousReserve1, previousTotalSupply)
       expect(contractState.fields['totalSupply']).toEqual(currentTotalSupply)
 
-      expectTokensEqual(contractState.asset.tokens!, [
-        { id: token0Id, amount: currentReserve0 },
-        { id: token1Id, amount: currentReserve1 },
-        { id: contractInfo.contractId, amount: (1n << 255n) - currentTotalSupply }
-      ])
+      if (token0Id === alphTokenId) {
+        expect(contractState.asset.alphAmount).toEqual(amount0 + initAsset.alphAmount)
+        expectTokensEqual(contractState.asset.tokens!, [
+          { id: token1Id, amount: currentReserve1 },
+          { id: contractInfo.contractId, amount: (1n << 255n) - currentTotalSupply }
+        ])
+      } else {
+        expect(contractState.asset.alphAmount).toEqual(initAsset.alphAmount)
+        expectTokensEqual(contractState.asset.tokens!, [
+          { id: token0Id, amount: currentReserve0 },
+          { id: token1Id, amount: currentReserve1 },
+          { id: contractInfo.contractId, amount: (1n << 255n) - currentTotalSupply }
+        ])
+      }
 
       const liquidityAssetOutput = testResult.txOutputs.find((o) => o.address === sender)!
       expect(liquidityAssetOutput.tokens!).toEqual([
@@ -171,24 +192,33 @@ describe('test token pair', () => {
       return contractState
     }
 
-    await expectAssertionError(testMint(100n, 5000n), contractInfo.address, 1)
-    const contractState0 = await testMint(1000n, 30000n)
-    const contractState1 = await testMint(1000n, 30000n, contractState0.fields, contractState0.asset)
-    const contractState2 = await testMint(1000n, 20000n, contractState1.fields, contractState1.asset)
-    const contractState3 = await testMint(30000n, 1000n, contractState2.fields, contractState2.asset)
-    await testMint(1000n, 30000n, contractState3.fields, contractState3.asset)
-  }, 10000)
+    async function test(token0Id: string, token1Id: string) {
+      const contractInfo = createTokenPair(token0Id, token1Id)
+      await expectAssertionError(testMint(contractInfo, 100n, 5000n), contractInfo.address, 1)
+      const contractState0 = await testMint(contractInfo, 1000n, 30000n)
+      const contractState1 = await testMint(contractInfo, 1000n, 30000n, contractState0.fields, contractState0.asset)
+      const contractState2 = await testMint(contractInfo, 1000n, 20000n, contractState1.fields, contractState1.asset)
+      const contractState3 = await testMint(contractInfo, 30000n, 1000n, contractState2.fields, contractState2.asset)
+      await testMint(contractInfo, 1000n, 30000n, contractState3.fields, contractState3.asset)
+    }
+
+    const [token0Id, token1Id] = randomTokenPair()
+    await test(token0Id, token1Id)
+    await test(alphTokenId, token1Id)
+  }, 20000)
 
   test('burn', async () => {
     await buildProject()
 
-    const [token0Id, token1Id] = randomTokenPair()
-    const contractInfo = createTokenPair(token0Id, token1Id)
     const sender = randomP2PKHAddress()
 
-    async function testBurn(liquidity: bigint, initialFields?: Fields, initialAsset?: Asset) {
-      const initFields = initialFields ?? contractInfo.selfState.fields
-      const initAsset = initialAsset ?? contractInfo.selfState.asset
+    async function testBurn(contractInfo: ContractInfo, liquidity: bigint, initialFields: Fields, initialAsset: Asset) {
+      const token0Id = initialFields['token0Id'] as string
+      const token1Id = initialFields['token1Id'] as string
+      const totalSupply = initialFields['totalSupply'] as Number256
+      const reserve0 = initialFields['reserve0'] as Number256
+      const reserve1 = initialFields['reserve1'] as Number256
+
       const inputAssets = [
         {
           address: sender,
@@ -198,9 +228,9 @@ describe('test token pair', () => {
           }
         }
       ]
-      return contractInfo.contract.testPublicMethod('burn', {
-        initialFields: initFields,
-        initialAsset: initAsset,
+      const burnResult = await contractInfo.contract.testPublicMethod('burn', {
+        initialFields: initialFields,
+        initialAsset: initialAsset,
         address: contractInfo.address,
         existingContracts: contractInfo.dependencies,
         testArgs: {
@@ -209,42 +239,70 @@ describe('test token pair', () => {
         },
         inputAssets: inputAssets
       })
+
+      const remainTokens = (1n << 255n) - totalSupply
+      const contractState = burnResult.contracts.find((c) => c.contractId === contractInfo.contractId)!
+      const amount0Out = (liquidity * reserve0) / totalSupply
+      const amount1Out = (liquidity * reserve1) / totalSupply
+
+      expect(contractState.fields['reserve0']).toEqual(reserve0 - amount0Out)
+      expect(contractState.fields['reserve1']).toEqual(reserve1 - amount1Out)
+      expect(contractState.fields['totalSupply']).toEqual(totalSupply - liquidity)
+
+      if (token0Id === alphTokenId) {
+        expect(contractState.asset.alphAmount).toEqual(initialAsset.alphAmount - amount0Out)
+        expectTokensEqual(contractState.asset.tokens!, [
+          { id: contractInfo.contractId, amount: remainTokens + liquidity },
+          { id: token1Id, amount: reserve1 - amount1Out }
+        ])
+      } else {
+        expect(contractState.asset.alphAmount).toEqual(initialAsset.alphAmount)
+        expectTokensEqual(contractState.asset.tokens!, [
+          { id: contractInfo.contractId, amount: remainTokens + liquidity },
+          { id: token0Id, amount: reserve0 - amount0Out },
+          { id: token1Id, amount: reserve1 - amount1Out }
+        ])
+      }
+      const assetOutput = burnResult.txOutputs.find((o) => o.address === sender)!
+
+      if (token0Id === alphTokenId) {
+        expect(assetOutput.alphAmount).toEqual(oneAlph - defaultGasFee + amount0Out)
+        expectTokensEqual(assetOutput.tokens!, [{ id: token1Id, amount: amount1Out }])
+      } else {
+        expect(assetOutput.alphAmount).toEqual(oneAlph - defaultGasFee)
+        expectTokensEqual(assetOutput.tokens!, [
+          { id: token0Id, amount: amount0Out },
+          { id: token1Id, amount: amount1Out }
+        ])
+      }
+      expect(burnResult.events.length).toEqual(1)
+      expect(burnResult.events[0].fields).toEqual({
+        sender: sender,
+        amount0: amount0Out,
+        amount1: amount1Out,
+        liquidity: liquidity
+      })
     }
 
-    const { contractState: contractState0, totalSupply } = await mint(contractInfo, sender, 1000n, 4000n)
-    await expectAssertionError(testBurn(1n, contractState0.fields, contractState0.asset), contractInfo.address, 3)
+    async function test(token0Id: string, token1Id: string) {
+      const contractInfo = createTokenPair(token0Id, token1Id)
+      const { contractState } = await mint(contractInfo, sender, 3333n, 8888n)
+      await expectAssertionError(
+        testBurn(contractInfo, 1n, contractState.fields, contractState.asset),
+        contractInfo.address,
+        3
+      )
+      await testBurn(contractInfo, 500n, contractState.fields, contractState.asset)
+    }
 
-    const remainTokens = (1n << 255n) - totalSupply
-    const liquidity = 500n
-    const burnResult = await testBurn(liquidity, contractState0.fields, contractState0.asset)
-    const contractState1 = burnResult.contracts.find((c) => c.contractId === contractInfo.contractId)!
-    expect(contractState1.fields['reserve0']).toEqual(750n)
-    expect(contractState1.fields['reserve1']).toEqual(3000n)
-    expect(contractState1.fields['totalSupply']).toEqual(1500n)
-    expectTokensEqual(contractState1.asset.tokens!, [
-      { id: contractInfo.contractId, amount: remainTokens + liquidity },
-      { id: token0Id, amount: 750n },
-      { id: token1Id, amount: 3000n }
-    ])
-    const assetOutput = burnResult.txOutputs.find((o) => o.address === sender)!
-    expectTokensEqual(assetOutput.tokens!, [
-      { id: token0Id, amount: 250n },
-      { id: token1Id, amount: 1000n }
-    ])
-    expect(burnResult.events.length).toEqual(1)
-    expect(burnResult.events[0].fields).toEqual({
-      sender: sender,
-      amount0: 250n,
-      amount1: 1000n,
-      liquidity: liquidity
-    })
-  })
+    const [token0Id, token1Id] = randomTokenPair()
+    await test(token0Id, token1Id)
+    await test(alphTokenId, token1Id)
+  }, 10000)
 
   test('swap', async () => {
     await buildProject()
 
-    const [token0Id, token1Id] = randomTokenPair()
-    const contractInfo = createTokenPair(token0Id, token1Id)
     const sender = randomP2PKHAddress()
 
     function getAmountOut(amountIn: bigint, reserveIn: bigint, reserveOut: bigint): bigint {
@@ -258,20 +316,34 @@ describe('test token pair', () => {
       return numerator / denominator
     }
 
-    const { contractState, reserve0, reserve1, totalSupply } = await mint(contractInfo, sender, 100n, 80000n)
-    async function testSwap(tokenInId: string, amountIn: bigint, amountOut: bigint) {
+    async function testSwap(
+      contractInfo: ContractInfo,
+      tokenInId: string,
+      amountIn: bigint,
+      amountOut: bigint,
+      initialFields: Fields,
+      initialAsset: Asset
+    ) {
+      const token0Id = initialFields['token0Id'] as string
+      const token1Id = initialFields['token1Id'] as string
+      const totalSupply = initialFields['totalSupply'] as Number256
+      const reserve0 = initialFields['reserve0'] as Number256
+      const reserve1 = initialFields['reserve1'] as Number256
+      const tokenOutId = token0Id === tokenInId ? token1Id : token0Id
+
+      const alphAmount = tokenInId === alphTokenId ? oneAlph + amountIn : oneAlph
       const inputAssets = [
         {
           address: sender,
           asset: {
-            alphAmount: oneAlph,
-            tokens: [{ id: tokenInId, amount: amountIn }]
+            alphAmount: alphAmount,
+            tokens: tokenInId === alphTokenId ? [] : [{ id: tokenInId, amount: amountIn }]
           }
         }
       ]
       const testResult = await contractInfo.contract.testPublicMethod('swap', {
-        initialFields: contractState.fields,
-        initialAsset: contractState.asset,
+        initialFields: initialFields,
+        initialAsset: initialAsset,
         address: contractInfo.address,
         existingContracts: contractInfo.dependencies,
         testArgs: {
@@ -288,15 +360,33 @@ describe('test token pair', () => {
       expect(newState.fields['reserve0']).toEqual(newReserve0)
       expect(newState.fields['reserve1']).toEqual(newReserve1)
       expect(newState.fields['totalSupply']).toEqual(totalSupply)
-      expectTokensEqual(newState.asset.tokens!, [
-        { id: contractInfo.contractId, amount: (1n << 255n) - totalSupply },
-        { id: token0Id, amount: newReserve0 },
-        { id: token1Id, amount: newReserve1 }
-      ])
 
-      const tokenOutId = tokenInId === token0Id ? token1Id : token0Id
+      if (token0Id === alphTokenId) {
+        expect(newState.asset.alphAmount).toEqual(oneAlph + newReserve0)
+        expectTokensEqual(newState.asset.tokens!, [
+          { id: contractInfo.contractId, amount: (1n << 255n) - totalSupply },
+          { id: token1Id, amount: newReserve1 }
+        ])
+      } else {
+        expect(newState.asset.alphAmount).toEqual(oneAlph)
+        expectTokensEqual(newState.asset.tokens!, [
+          { id: contractInfo.contractId, amount: (1n << 255n) - totalSupply },
+          { id: token0Id, amount: newReserve0 },
+          { id: token1Id, amount: newReserve1 }
+        ])
+      }
+
       const assetOutput = testResult.txOutputs.find((o) => o.address === sender)!
-      expectTokensEqual(assetOutput.tokens!, [{ id: tokenOutId, amount: amountOut }])
+      if (tokenOutId === alphTokenId) {
+        expect(assetOutput.alphAmount).toEqual(alphAmount - defaultGasFee + amountOut)
+        expect(assetOutput.tokens).toEqual([])
+      } else if (tokenInId === alphTokenId) {
+        expect(assetOutput.alphAmount).toEqual(alphAmount - defaultGasFee - amountIn)
+        expectTokensEqual(assetOutput.tokens!, [{ id: tokenOutId, amount: amountOut }])
+      } else {
+        expect(assetOutput.alphAmount).toEqual(alphAmount - defaultGasFee)
+        expectTokensEqual(assetOutput.tokens!, [{ id: tokenOutId, amount: amountOut }])
+      }
       expect(testResult.events.length).toEqual(1)
       expect(testResult.events[0].fields).toEqual({
         sender: sender,
@@ -306,19 +396,51 @@ describe('test token pair', () => {
       })
     }
 
-    await expectAssertionError(testSwap(token0Id, reserve0, reserve1), contractInfo.address, 5)
-    await expectAssertionError(testSwap(token1Id, reserve1, reserve0), contractInfo.address, 5)
-    await expectAssertionError(testSwap(token0Id, 10n, 0n), contractInfo.address, 9)
-    await expectAssertionError(testSwap(randomTokenId(), 10n, 10n), contractInfo.address, 6)
+    async function test(token0Id: string, token1Id: string) {
+      const contractInfo = createTokenPair(token0Id, token1Id)
+      const { contractState, reserve0, reserve1 } = await mint(contractInfo, sender, 100n, 80000n)
+      await expectAssertionError(
+        testSwap(contractInfo, token0Id, reserve0, reserve1, contractState.fields, contractState.asset),
+        contractInfo.address,
+        5
+      )
+      await expectAssertionError(
+        testSwap(contractInfo, token1Id, reserve1, reserve0, contractState.fields, contractState.asset),
+        contractInfo.address,
+        5
+      )
+      await expectAssertionError(
+        testSwap(contractInfo, token0Id, 10n, 0n, contractState.fields, contractState.asset),
+        contractInfo.address,
+        9
+      )
+      await expectAssertionError(
+        testSwap(contractInfo, randomTokenId(), 10n, 10n, contractState.fields, contractState.asset),
+        contractInfo.address,
+        6
+      )
 
-    const amountIn0 = 20n // token0Id
-    const expectedAmountOut0 = getAmountOut(amountIn0, reserve0, reserve1)
-    await testSwap(token0Id, amountIn0, expectedAmountOut0)
-    await expectAssertionError(testSwap(token0Id, amountIn0, expectedAmountOut0 + 1n), contractInfo.address, 8)
+      const amountIn0 = 20n // token0Id
+      const expectedAmountOut0 = getAmountOut(amountIn0, reserve0, reserve1)
+      await testSwap(contractInfo, token0Id, amountIn0, expectedAmountOut0, contractState.fields, contractState.asset)
+      await expectAssertionError(
+        testSwap(contractInfo, token0Id, amountIn0, expectedAmountOut0 + 1n, contractState.fields, contractState.asset),
+        contractInfo.address,
+        8
+      )
 
-    const amountIn1 = 60000n // token1Id
-    const expectedAmountOut1 = getAmountOut(amountIn1, reserve1, reserve0)
-    await testSwap(token1Id, amountIn1, expectedAmountOut1)
-    await expectAssertionError(testSwap(token1Id, amountIn1, expectedAmountOut1 + 1n), contractInfo.address, 8)
-  }, 20000)
+      const amountIn1 = 60000n // token1Id
+      const expectedAmountOut1 = getAmountOut(amountIn1, reserve1, reserve0)
+      await testSwap(contractInfo, token1Id, amountIn1, expectedAmountOut1, contractState.fields, contractState.asset)
+      await expectAssertionError(
+        testSwap(contractInfo, token1Id, amountIn1, expectedAmountOut1 + 1n, contractState.fields, contractState.asset),
+        contractInfo.address,
+        8
+      )
+    }
+
+    const [token0Id, token1Id] = randomTokenPair()
+    await test(token0Id, token1Id)
+    await test(alphTokenId, token1Id)
+  }, 40000)
 })
