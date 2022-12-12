@@ -28,8 +28,8 @@ Contract TokenPair(
     let timeElapsed = blockTimeStampSecond - blockTimeStampLast
     if (timeElapsed > 0 && reserve0 > 0 && reserve1 > 0) {
       // allow overflow for TWAP(time-weighted-average-price)
-      price0CumulativeLast = addWithOverflow(uqdiv(reserve1, reserve0) * timeElapsed, price0CumulativeLast)
-      price1CumulativeLast = addWithOverflow(uqdiv(reserve0, reserve1) * timeElapsed, price1CumulativeLast)
+      price0CumulativeLast = price0CumulativeLast |+| uqdiv(reserve1, reserve0) * timeElapsed
+      price1CumulativeLast = price1CumulativeLast |+| uqdiv(reserve0, reserve1) * timeElapsed
     }
     
     reserve1 = newReserve1

@@ -1,8 +1,8 @@
 {
   "version": "v1.5.2",
   "name": "MathTest",
-  "bytecode": "000340424054408a01000203011213dcffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff16002b170216021601314c06160116022b0d2b02160016012a0201000202010816000d1340703b2c16012d0201000103011f16000f334c191600170116000e2d0d2a170216021601314c0b16021701160016022d16022a0e2d17024a311601020d02",
-  "codeHash": "3489cfa265232dabdd8a91ebcf0889b8a48ebb6e01a3fc043f1b0e6d9440aab0",
+  "bytecode": "000212404801000202010816000d1340703b2c16012d0201000103011f16000f334c191600170116000e2d0d2a170216021601314c0b16021701160016022d16022a0e2d17024a311601020d02",
+  "codeHash": "085c8183210ec7296681e12ab74e37bebee9d495e78e24cc9b3cd1b110d6df2a",
   "fieldsSig": {
     "names": [],
     "types": [],
@@ -10,27 +10,6 @@
   },
   "eventsSig": [],
   "functions": [
-    {
-      "name": "addWithOverflow",
-      "usePreapprovedAssets": false,
-      "useAssetsInContract": false,
-      "isPublic": true,
-      "paramNames": [
-        "a",
-        "b"
-      ],
-      "paramTypes": [
-        "U256",
-        "U256"
-      ],
-      "paramIsMutable": [
-        false,
-        false
-      ],
-      "returnTypes": [
-        "U256"
-      ]
-    },
     {
       "name": "uqdiv",
       "usePreapprovedAssets": false,

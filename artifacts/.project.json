@@ -9,9 +9,9 @@
   },
   "infos": {
     "contracts/dex/token_pair.ral": {
-      "sourceCodeHash": "27d62a275b572b6dc1dccd0627c2d758ede480ab84dd265f7e6156d7b66c110e",
+      "sourceCodeHash": "5d4657e1bbbb918682b56eeb11305617784aaa68cd15b91713bf58e1afdfa55f",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "d2f6c1e3053cd5df4868fc9c5930341441f52aa07298fc33ec13809abc30d66a",
+      "codeHashDebug": "706f29fe7f1a8cf30877e87170961ef8d355424d6d1ac76ed10124d0e1ca4e21",
       "warnings": []
     },
     "contracts/dex/token_pair_factory.ral": {
@@ -23,7 +23,7 @@
     "contracts/test/math_test.ral": {
       "sourceCodeHash": "7f307735569bf071f47a34a3abfe87c9529c53890765d90c1aabf6bdb8494a81",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "3489cfa265232dabdd8a91ebcf0889b8a48ebb6e01a3fc043f1b0e6d9440aab0",
+      "codeHashDebug": "085c8183210ec7296681e12ab74e37bebee9d495e78e24cc9b3cd1b110d6df2a",
       "warnings": []
     },
     "contracts/dex/constants.ral": {
@@ -33,7 +33,7 @@
       "warnings": []
     },
     "contracts/dex/math.ral": {
-      "sourceCodeHash": "b6014ddaf04def57bf3ad7ac8124213beee8ef414c838bbd7f4ec2e426f5b421",
+      "sourceCodeHash": "294fcf238fa765ce89e59e46f1f356e9bc7b305fdf4bebbd5bdb526dc7061dc9",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []

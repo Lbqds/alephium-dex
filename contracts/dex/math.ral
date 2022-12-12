@@ -1,15 +1,4 @@
 Abstract Contract Math() {
-  const U256Max = 115792089237316195423570985008687907853269984665640564039457584007913129639935
-
-  @using(updateFields = false)
-  pub fn addWithOverflow(a: U256, b: U256) -> U256 {
-    let diff = U256Max - a
-    if (diff < b) {
-      return b - diff - 1
-    }
-    return a + b
-  }
-
   @using(updateFields = false)
   pub fn uqdiv(a: U256, b: U256) -> U256 {
     return a * (1 << 112) / b
