@@ -6,7 +6,6 @@ Contract TokenPairFactory(
 
   event PairCreated(token0: ByteVec, token1: ByteVec, pair: ByteVec, currentPairSize: U256)
 
-  @using(updateFields = false)
   fn sortTokens(tokenA: ByteVec, tokenB: ByteVec) -> (ByteVec, ByteVec) {
     let left = u256From32Byte!(tokenA)
     let right = u256From32Byte!(tokenB)
@@ -16,7 +15,7 @@ Contract TokenPairFactory(
     return tokenB, tokenA
   }
 
-  @using(preapprovedAssets = true)
+  @using(preapprovedAssets = true, updateFields = true)
   pub fn createPair(
     payer: Address,
     alphAmount: U256,
@@ -35,7 +34,7 @@ Contract TokenPairFactory(
       0,                   // price1CumulativeLast
       0                    // totalSupply
     )
-    let pairId = copyCreateSubContractWithToken!{payer -> alphAmount}(
+    let pairId = copyCreateSubContractWithToken!{payer -> ALPH: alphAmount}(
       token0Id ++ token1Id,
       pairTemplateId,
       encodedFields,

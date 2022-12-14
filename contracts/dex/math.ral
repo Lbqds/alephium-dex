@@ -1,11 +1,9 @@
 Abstract Contract Math() {
-  @using(updateFields = false)
   pub fn uqdiv(a: U256, b: U256) -> U256 {
     return a * (1 << 112) / b
   }
 
   // babylonian method
-  @using(updateFields = false)
   pub fn sqrt(y: U256) -> U256 {
     if (y > 3) {
       let mut z = y

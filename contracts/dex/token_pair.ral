@@ -15,11 +15,12 @@ Contract TokenPair(
 
   const MINIMUM_LIQUIDITY = 1000
 
-  @using(updateFields = false, externalCallCheck = false)
+  @using(externalCallCheck = false)
   pub fn getTokenPair() -> (ByteVec, ByteVec) {
     return token0Id, token1Id
   }
 
+  @using(updateFields = true)
   fn update(newReserve0: U256, newReserve1: U256) -> () {
     let max = 1 << 112 - 1
     assert!(newReserve0 < max && newReserve1 < max, ErrorCodes.ReserveOverflow)
@@ -37,7 +38,7 @@ Contract TokenPair(
     blockTimeStampLast = blockTimeStampSecond
   }
 
-  @using(preapprovedAssets = true, assetsInContract = true)
+  @using(preapprovedAssets = true, assetsInContract = true, updateFields = true)
   pub fn mint(sender: Address, amount0: U256, amount1: U256) -> () {
     let mut liquidity = 0
     if (totalSupply == 0) {
@@ -64,7 +65,7 @@ Contract TokenPair(
     emit Mint(sender, amount0, amount1, liquidity)
   }
 
-  @using(preapprovedAssets = true, assetsInContract = true)
+  @using(preapprovedAssets = true, assetsInContract = true, updateFields = true)
   pub fn burn(sender: Address, liquidity: U256) -> () {
     let amount0 = liquidity * reserve0 / totalSupply
     let amount1 = liquidity * reserve1 / totalSupply
