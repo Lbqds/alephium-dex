@@ -1,0 +1,43 @@
+{
+  "version": "v1.5.5",
+  "name": "RemoveLiquidity",
+  "bytecodeTemplate": "0101030000000d{0}{1}{2}a3{0}{2}{3}{4}{5}110c{1}0107",
+  "fieldsSig": {
+    "names": [
+      "sender",
+      "pairId",
+      "liquidity",
+      "amount0Min",
+      "amount1Min",
+      "deadline"
+    ],
+    "types": [
+      "Address",
+      "ByteVec",
+      "U256",
+      "U256",
+      "U256",
+      "U256"
+    ],
+    "isMutable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "functions": [
+    {
+      "name": "main",
+      "usePreapprovedAssets": true,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    }
+  ]
+}

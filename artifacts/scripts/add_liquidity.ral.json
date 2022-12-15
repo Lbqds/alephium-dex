@@ -1,0 +1,46 @@
+{
+  "version": "v1.5.5",
+  "name": "AddLiquidity",
+  "bytecodeTemplate": "010103000200180c0e{1}010217011700{0}7a1600{2}a31601{3}a3{0}{2}{3}{4}{5}{6}13060c{1}0106",
+  "fieldsSig": {
+    "names": [
+      "sender",
+      "pair",
+      "amount0Desired",
+      "amount1Desired",
+      "amount0Min",
+      "amount1Min",
+      "deadline"
+    ],
+    "types": [
+      "Address",
+      "ByteVec",
+      "U256",
+      "U256",
+      "U256",
+      "U256",
+      "U256"
+    ],
+    "isMutable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "functions": [
+    {
+      "name": "main",
+      "usePreapprovedAssets": true,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    }
+  ]
+}

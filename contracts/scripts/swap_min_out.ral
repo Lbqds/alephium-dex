@@ -1,0 +1,23 @@
+TxScript SwapMinOut(
+  sender: Address,
+  pair: TokenPair,
+  tokenInId: ByteVec,
+  amountIn: U256,
+  amountOutMin: U256
+) {
+  let (token0Id, _) = pair.getTokenPair()
+  let (reserve0, reserve1) = pair.getReserves()
+  let amountOut = if (tokenInId == token0Id) getAmountOut(reserve0, reserve1) else getAmountOut(reserve1, reserve0)
+  assert!(amountOut >= amountOutMin, 0)
+  pair.swap{sender -> tokenInId: amountIn}(sender, tokenInId, amountIn, amountOut)
+
+  fn getAmountOut(reserveIn: U256, reserveOut: U256) -> U256 {
+    //  fee = 0.003 * amountIn
+    // ((amountIn - fee) + reserveIn) * (reserveOut - amountOut) >= reserveIn * reserveOut =>
+    // amountOut <= (997 * amountIn * reserveOut) / (997 * amountIn + 1000 * reserveIn)
+    let amountInExcludeFee = 997 * amountIn
+    let numerator = amountInExcludeFee * reserveOut
+    let denominator = amountInExcludeFee + 1000 * reserveIn
+    return numerator / denominator
+  }
+}

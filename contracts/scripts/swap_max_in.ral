@@ -1,0 +1,22 @@
+TxScript SwapMaxIn(
+  sender: Address,
+  pair: TokenPair,
+  tokenInId: ByteVec,
+  amountInMax: U256,
+  amountOut: U256
+) {
+  let (token0Id, _) = pair.getTokenPair()
+  let (reserve0, reserve1) = pair.getReserves()
+  let amountIn = if (tokenInId == token0Id) getAmountIn(reserve0, reserve1) else getAmountIn(reserve1, reserve0)
+  assert!(amountIn <= amountInMax, 0)
+  pair.swap{sender -> tokenInId: amountIn}(sender, tokenInId, amountIn, amountOut)
+
+  fn getAmountIn(reserveIn: U256, reserveOut: U256) -> U256 {
+    //  fee = 0.003 * amountIn
+    // ((amountIn - fee) + reserveIn) * (reserveOut - amountOut) >= reserveIn * reserveOut =>
+    // amountIn >= (reserveIn * amountOut * 1000) / (reserveOut - amountOut) * 997
+    let numerator = reserveIn * amountOut * 1000
+    let denominator = (reserveOut - amountOut) * 997
+    return (numerator / denominator) + 1
+  }
+}

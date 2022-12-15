@@ -9,9 +9,9 @@
   },
   "infos": {
     "contracts/dex/token_pair.ral": {
-      "sourceCodeHash": "a3ef280ec1f5af883e6c1c9487f1b41502b6ad4bd808cabd583dbce78aea368e",
+      "sourceCodeHash": "6e068b34ae999572610da7b2b722b9610a8b7bb77fb9a1a3a30f7300ca9eb723",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "706f29fe7f1a8cf30877e87170961ef8d355424d6d1ac76ed10124d0e1ca4e21",
+      "codeHashDebug": "15d64db57fe5bca873c59bf9f2f7c279d21850682e49f8120d6ce961ccdc09b9",
       "warnings": []
     },
     "contracts/dex/token_pair_factory.ral": {
@@ -26,8 +26,44 @@
       "codeHashDebug": "085c8183210ec7296681e12ab74e37bebee9d495e78e24cc9b3cd1b110d6df2a",
       "warnings": []
     },
+    "contracts/scripts/add_liquidity.ral": {
+      "sourceCodeHash": "973ac29f8aae5938d2d6f02c6313fedf8a0d4be4eb2b831d1024e2ab3707cfbe",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "",
+      "warnings": []
+    },
+    "contracts/scripts/create_pair.ral": {
+      "sourceCodeHash": "2e673335598cf9e0b9466fb37989734688588ebf7e0518715532077c3d6de700",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "",
+      "warnings": []
+    },
+    "contracts/scripts/remove_liquidity.ral": {
+      "sourceCodeHash": "1dabfe01501208c799b66a5347154d9a0a3a7d3987ac711bd3b5d45402eb95d4",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "",
+      "warnings": []
+    },
+    "contracts/scripts/swap.ral": {
+      "sourceCodeHash": "572336a9372749faeb568efe35594b971302ef4088205d992c4049de30e75a07",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "",
+      "warnings": []
+    },
+    "contracts/scripts/swap_max_in.ral": {
+      "sourceCodeHash": "1eae9ada99a79141a6361e20273b7af32b077f15d31f2df0bb79e6b514429f31",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "",
+      "warnings": []
+    },
+    "contracts/scripts/swap_min_out.ral": {
+      "sourceCodeHash": "92515a08ace370813891123bd9271d8cc4c4cdc16ea1521b4aec12f5a6082904",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "",
+      "warnings": []
+    },
     "contracts/dex/constants.ral": {
-      "sourceCodeHash": "02effaa427e3bfb09e1e1dc966d1434b6730169113b95c653be3112e21ab8e26",
+      "sourceCodeHash": "3002f0d59c1d7a76b8aaa7dc5d2194840210e4337b8be7e4540b2aa7eeeb9c69",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []

@@ -1,0 +1,40 @@
+{
+  "version": "v1.5.5",
+  "name": "CreatePair",
+  "bytecodeTemplate": "0101030000000b{0}{2}a2{0}{2}{3}{4}100c{1}0101",
+  "fieldsSig": {
+    "names": [
+      "payer",
+      "factory",
+      "alphAmount",
+      "tokenAId",
+      "tokenBId"
+    ],
+    "types": [
+      "Address",
+      "ByteVec",
+      "U256",
+      "ByteVec",
+      "ByteVec"
+    ],
+    "isMutable": [
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "functions": [
+    {
+      "name": "main",
+      "usePreapprovedAssets": true,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    }
+  ]
+}

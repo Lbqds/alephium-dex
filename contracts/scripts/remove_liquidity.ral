@@ -1,0 +1,12 @@
+TxScript RemoveLiquidity(
+  sender: Address,
+  pairId: ByteVec,
+  liquidity: U256,
+  amount0Min: U256,
+  amount1Min: U256,
+  deadline: U256
+) {
+  TokenPair(pairId).removeLiquidity{sender -> pairId: liquidity}(
+    sender, liquidity, amount0Min, amount1Min, deadline
+  )
+}
