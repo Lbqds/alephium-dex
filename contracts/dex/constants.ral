@@ -12,5 +12,8 @@ Abstract Contract Constants() {
     InsufficientOutputAmount    = 9
     InsufficientInputAmount     = 10
     IdenticalTokenIds           = 11
+    Expired                     = 12
+    InsufficientToken0Amount    = 13
+    InsufficientToken1Amount    = 14
   }
 }
