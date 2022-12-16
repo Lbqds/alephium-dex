@@ -2,7 +2,7 @@ import { Configuration } from '@alephium/cli'
 
 const configuration: Configuration<undefined> = {
   defaultNetwork: 'devnet',
-  toDeployGroups: [0, 1, 2, 3], // here we could configure which address groups to deploy the contract
+  toDeployGroups: [0],
   networks: {
     devnet: {
       nodeUrl: 'http://localhost:22973',
