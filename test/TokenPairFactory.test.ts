@@ -1,4 +1,4 @@
-import { web3 } from '@alephium/web3'
+import { Token, web3 } from '@alephium/web3'
 import { expectAssertionError } from '@alephium/web3-test'
 import {
   alphTokenId,
@@ -21,7 +21,11 @@ describe('test token pair factory', () => {
     const contract = contractInfo.contract
     const payer = randomP2PKHAddress()
 
-    async function test(tokenAId: string, tokenBId: string) {
+    async function test(tokenAId: string, tokenBId: string, tokens?: Token[]) {
+      const inputAssetTokens = tokens ?? [
+        { id: tokenAId, amount: 1n },
+        { id: tokenBId, amount: 1n }
+      ]
       const testResult = await contract.testPublicMethod('createPair', {
         initialFields: contractInfo.selfState.fields,
         address: contractInfo.address,
@@ -36,7 +40,8 @@ describe('test token pair factory', () => {
           {
             address: payer,
             asset: {
-              alphAmount: oneAlph * 2n
+              alphAmount: oneAlph * 2n,
+              tokens: inputAssetTokens
             }
           }
         ]
@@ -62,11 +67,20 @@ describe('test token pair factory', () => {
     }
 
     const [token0Id, token1Id] = randomTokenPair()
-    await expectAssertionError(test(token0Id, token0Id), contractInfo.address, 11)
+    await expectAssertionError(test(token0Id, token0Id, [{ id: token0Id, amount: 1n }]), contractInfo.address, 11)
 
     await test(token0Id, token1Id)
     await test(token1Id, token0Id)
-    await test(alphTokenId, token1Id)
-    await test(token1Id, alphTokenId)
-  })
+    await test(alphTokenId, token1Id, [{ id: token1Id, amount: 1n }])
+    await test(token1Id, alphTokenId, [{ id: token1Id, amount: 1n }])
+
+    await expectAssertionError(
+      test(token0Id, token1Id, [
+        { id: token0Id, amount: 0n },
+        { id: token1Id, amount: 0n }
+      ]),
+      contractInfo.address,
+      15
+    )
+  }, 10000)
 })

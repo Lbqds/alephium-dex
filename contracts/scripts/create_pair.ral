@@ -5,5 +5,5 @@ TxScript CreatePair(
   tokenAId: ByteVec,
   tokenBId: ByteVec
 ) {
-  factory.createPair{payer -> ALPH: alphAmount}(payer, alphAmount, tokenAId, tokenBId)
+  factory.createPair{payer -> ALPH: alphAmount, tokenAId: 1, tokenBId: 1}(payer, alphAmount, tokenAId, tokenBId)
 }

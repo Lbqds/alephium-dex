@@ -22,6 +22,11 @@ Contract TokenPairFactory(
     tokenAId: ByteVec,
     tokenBId: ByteVec
   ) -> () {
+    assert!(
+      tokenRemaining!(payer, tokenAId) > 0 &&
+      tokenRemaining!(payer, tokenBId) > 0,
+      ErrorCodes.TokenNotExist
+    )
     assert!(tokenAId != tokenBId, ErrorCodes.IdenticalTokenIds)
     let (token0Id, token1Id) = sortTokens(tokenAId, tokenBId)
     let encodedFields = encodeToByteVec!(
