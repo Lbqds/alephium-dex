@@ -1,0 +1,6 @@
+Contract TestToken() {
+  @using(assetsInContract = true)
+  pub fn getToken(sender: Address, amount: U256) -> () {
+    transferTokenFromSelf!(sender, selfTokenId!(), amount)
+  }
+}
