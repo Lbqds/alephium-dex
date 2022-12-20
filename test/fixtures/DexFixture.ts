@@ -18,6 +18,25 @@ export const maxGasPerTx = 625000n
 export const defaultGasFee = gasPrice * maxGasPerTx
 export const alphTokenId = ''.padStart(64, '0')
 
+export enum ErrorCodes {
+  ReserveOverflow,
+  InsufficientInitLiquidity,
+  InsufficientLiquidityMinted,
+  InsufficientLiquidityBurned,
+  InvalidToAddress,
+  InsufficientLiquidity,
+  InvalidTokenInId,
+  InvalidCalleeId,
+  InvalidK,
+  InsufficientOutputAmount,
+  InsufficientInputAmount,
+  IdenticalTokenIds,
+  Expired,
+  InsufficientToken0Amount,
+  InsufficientToken1Amount,
+  TokenNotExist
+}
+
 export class ContractInfo {
   contract: Contract
   selfState: ContractState

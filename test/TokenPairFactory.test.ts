@@ -4,6 +4,7 @@ import {
   alphTokenId,
   buildProject,
   createTokenPairFactory,
+  ErrorCodes,
   oneAlph,
   randomP2PKHAddress,
   randomTokenPair,
@@ -67,7 +68,11 @@ describe('test token pair factory', () => {
     }
 
     const [token0Id, token1Id] = randomTokenPair()
-    await expectAssertionError(test(token0Id, token0Id, [{ id: token0Id, amount: 1n }]), contractInfo.address, 11)
+    await expectAssertionError(
+      test(token0Id, token0Id, [{ id: token0Id, amount: 1n }]),
+      contractInfo.address,
+      ErrorCodes.IdenticalTokenIds
+    )
 
     await test(token0Id, token1Id)
     await test(token1Id, token0Id)
@@ -80,7 +85,7 @@ describe('test token pair factory', () => {
         { id: token1Id, amount: 0n }
       ]),
       contractInfo.address,
-      15
+      ErrorCodes.TokenNotExist
     )
   }, 10000)
 })

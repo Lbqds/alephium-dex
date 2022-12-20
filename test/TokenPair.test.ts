@@ -5,6 +5,7 @@ import {
   ContractInfo,
   createTokenPair,
   defaultGasFee,
+  ErrorCodes,
   oneAlph,
   randomP2PKHAddress,
   randomTokenId,
@@ -167,10 +168,18 @@ describe('test token pair', () => {
 
     expect(await test(0n, 0n, 100n, 200n, 80n, 160n)).toEqual([100n, 200n])
     expect(await test(1000n, 3000n, 1000n, 3000n, 1000n, 3000n)).toEqual([1000n, 3000n])
-    await expectAssertionError(test(1000n, 3000n, 500n, 3000n, 500n, 2000n), contractInfo.address, 14)
+    await expectAssertionError(
+      test(1000n, 3000n, 500n, 3000n, 500n, 2000n),
+      contractInfo.address,
+      ErrorCodes.InsufficientToken1Amount
+    )
     expect(await test(1000n, 3000n, 500n, 3000n, 500n, 1500n)).toEqual([500n, 1500n])
     expect(await test(1000n, 3000n, 500n, 3000n, 500n, 1000n)).toEqual([500n, 1500n])
-    await expectAssertionError(test(1000n, 3000n, 1000n, 2000n, 800n, 2000n), contractInfo.address, 13)
+    await expectAssertionError(
+      test(1000n, 3000n, 1000n, 2000n, 800n, 2000n),
+      contractInfo.address,
+      ErrorCodes.InsufficientToken0Amount
+    )
     expect(await test(1000n, 3000n, 1000n, 2000n, 500n, 2000n)).toEqual([666n, 2000n])
     expect(await test(1000n, 3000n, 1000n, 2000n, 500n, 1000n)).toEqual([666n, 2000n])
 
@@ -311,13 +320,13 @@ describe('test token pair', () => {
       await expectAssertionError(
         testAddLiquidity(contractInfo, 1000n, 5000n, 1000n, 5000n, BigInt(Date.now())),
         contractInfo.address,
-        12
+        ErrorCodes.Expired
       )
       const timestamp = BigInt(Date.now() + 60000)
       await expectAssertionError(
         testAddLiquidity(contractInfo, 100n, 5000n, 100n, 5000n, timestamp),
         contractInfo.address,
-        1
+        ErrorCodes.InsufficientInitLiquidity
       )
       const contractState0 = await testAddLiquidity(contractInfo, 1000n, 30000n, 1000n, 30000n, timestamp)
       const contractState1 = await testAddLiquidity(
@@ -460,23 +469,23 @@ describe('test token pair', () => {
       await expectAssertionError(
         testRemoveLiquidity(contractInfo, 1n, 100n, 100n, timestamp, contractState.fields, contractState.asset),
         contractInfo.address,
-        3
+        ErrorCodes.InsufficientLiquidityBurned
       )
       const invalidTs = BigInt(Date.now())
       await expectAssertionError(
         testRemoveLiquidity(contractInfo, 500n, 251n, 1000n, invalidTs, contractState.fields, contractState.asset),
         contractInfo.address,
-        12
+        ErrorCodes.Expired
       )
       await expectAssertionError(
         testRemoveLiquidity(contractInfo, 500n, 251n, 1000n, timestamp, contractState.fields, contractState.asset),
         contractInfo.address,
-        13
+        ErrorCodes.InsufficientToken0Amount
       )
       await expectAssertionError(
         testRemoveLiquidity(contractInfo, 500n, 250n, 1001n, timestamp, contractState.fields, contractState.asset),
         contractInfo.address,
-        14
+        ErrorCodes.InsufficientToken1Amount
       )
       await testRemoveLiquidity(contractInfo, 500n, 250n, 1000n, timestamp, contractState.fields, contractState.asset)
     }
@@ -596,22 +605,22 @@ describe('test token pair', () => {
       await expectAssertionError(
         testSwap(contractInfo, token0Id, reserve0, reserve1, contractState.fields, contractState.asset),
         contractInfo.address,
-        5
+        ErrorCodes.InsufficientLiquidity
       )
       await expectAssertionError(
         testSwap(contractInfo, token1Id, reserve1, reserve0, contractState.fields, contractState.asset),
         contractInfo.address,
-        5
+        ErrorCodes.InsufficientLiquidity
       )
       await expectAssertionError(
         testSwap(contractInfo, token0Id, 10n, 0n, contractState.fields, contractState.asset),
         contractInfo.address,
-        9
+        ErrorCodes.InsufficientOutputAmount
       )
       await expectAssertionError(
         testSwap(contractInfo, randomTokenId(), 10n, 10n, contractState.fields, contractState.asset),
         contractInfo.address,
-        6
+        ErrorCodes.InvalidTokenInId
       )
 
       const amountIn0 = 20n // token0Id
@@ -620,7 +629,7 @@ describe('test token pair', () => {
       await expectAssertionError(
         testSwap(contractInfo, token0Id, amountIn0, expectedAmountOut0 + 1n, contractState.fields, contractState.asset),
         contractInfo.address,
-        8
+        ErrorCodes.InvalidK
       )
 
       const amountIn1 = 60000n // token1Id
@@ -629,7 +638,7 @@ describe('test token pair', () => {
       await expectAssertionError(
         testSwap(contractInfo, token1Id, amountIn1, expectedAmountOut1 + 1n, contractState.fields, contractState.asset),
         contractInfo.address,
-        8
+        ErrorCodes.InvalidK
       )
     }
 
