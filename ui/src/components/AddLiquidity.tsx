@@ -318,7 +318,8 @@ function AddLiquidity() {
     tokenBInfo !== undefined &&
     tokenAAmount !== undefined &&
     tokenBAmount !== undefined &&
-    !addingLiquidity && !completed && isReady
+    !addingLiquidity && !completed && isReady && 
+    error === undefined
   const addLiquidityButton = (
     <ButtonWithLoader
       disabled={!readyToAddLiquidity}

@@ -20,7 +20,6 @@ import { network } from "../utils/consts";
 import { getAmountIn, getAmountOut, getTokenPairState, swap, TokenInfo, TokenPairState } from "../utils/dex";
 import AlephiumWalletKey from "../components/AlephiumWalletKey";
 import useGetDexTokens from "../hooks/useGetDexTokens";
-import { web3 } from "@alephium/web3";
 
 const useStyles = makeStyles((theme) => ({
   numberField: {
@@ -296,7 +295,8 @@ function Swap() {
     tokenOutInfo !== undefined &&
     tokenInAmount !== undefined &&
     tokenOutAmount !== undefined &&
-    !swapping && !completed && isReady
+    !swapping && !completed && isReady &&
+    error === undefined
   const swapButton = (
     <ButtonWithLoader
       disabled={!readyToSwap}
