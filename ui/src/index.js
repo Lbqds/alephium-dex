@@ -2,6 +2,7 @@ import { CssBaseline } from "@material-ui/core";
 import { ThemeProvider } from "@material-ui/core/styles";
 import { SnackbarProvider } from "notistack";
 import ReactDOM from "react-dom";
+import { HashRouter } from "react-router-dom";
 import App from "./App";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { AlephiumWalletProvider } from "./contexts/AlephiumWalletContext";
@@ -12,7 +13,9 @@ ReactDOM.render(
       <CssBaseline />
         <AlephiumWalletProvider>
           <SnackbarProvider maxSnack={3}>
-            <App />
+            <HashRouter>
+              <App />
+            </HashRouter>
           </SnackbarProvider>
         </AlephiumWalletProvider>
     </ThemeProvider>

@@ -1,7 +1,23 @@
-import { addressFromContractId, Contract, Script, Number256, subContractId, SignerProvider, SignExecuteScriptTxResult, NodeProvider, node, web3 } from "@alephium/web3"
+import {
+  addressFromContractId,
+  Contract,
+  Script,
+  Number256,
+  subContractId,
+  SignerProvider,
+  SignExecuteScriptTxResult,
+  NodeProvider,
+  node,
+  web3
+} from "@alephium/web3"
 import { default as tokenPairContractJson } from "../artifacts/dex/token_pair.ral.json"
 import { default as swapScriptJson } from "../artifacts/scripts/swap.ral.json"
+import { default as addLiquidityJson } from "../artifacts/scripts/add_liquidity.ral.json"
 import { network } from "./consts"
+import BigNumber from "bignumber.js"
+
+const MINIMUM_LIQUIDITY = 1000n
+const DEFAULT_TTL = 60 * 60 * 1000 // one hour in millis
 
 export interface TokenPair {
   token0Id: string
@@ -84,6 +100,7 @@ export interface TokenPairState {
   reserve1: bigint
   token0Id: string
   token1Id: string
+  totalSupply: bigint
 }
 
 export async function getTokenPairState(tokenAId: string, tokenBId: string): Promise<TokenPairState> {
@@ -100,6 +117,7 @@ export async function getTokenPairState(tokenAId: string, tokenBId: string): Pro
     reserve1: state.fields['reserve1'] as Number256,
     token0Id: state.fields['token0Id'] as string,
     token1Id: state.fields['token1Id'] as string,
+    totalSupply: state.fields['totalSupply'] as Number256
   }
 }
 
@@ -179,4 +197,102 @@ export async function waitTxConfirmed(
   }
   await new Promise((r) => setTimeout(r, 1000))
   return waitTxConfirmed(provider, txId, confirmations)
+}
+
+export interface AddLiquidityResult {
+  amountA: bigint
+  amountB: bigint
+  shareAmount: bigint
+  sharePercentage: number
+}
+
+export function formatAddLiquidityResult(result: AddLiquidityResult): string {
+  return `Share amount: ${result.shareAmount.toString()}, share percentage: ${result.sharePercentage}%`
+}
+
+export function getInitAddLiquidityResult(amountA: bigint, amountB: bigint): AddLiquidityResult {
+  const liquidity = sqrt(amountA * amountB)
+  if (liquidity <= MINIMUM_LIQUIDITY) {
+    throw new Error('insufficient initial liquidity')
+  }
+  return {
+    amountA: amountA,
+    amountB: amountB,
+    shareAmount: liquidity - MINIMUM_LIQUIDITY,
+    sharePercentage: 100
+  }
+}
+
+export function getAddLiquidityResult(state: TokenPairState, tokenId: string, amountA: bigint, type: 'TokenA' | 'TokenB'): AddLiquidityResult {
+  const [reserveA, reserveB] = tokenId === state.token0Id
+    ? [state.reserve0, state.reserve1]
+    : [state.reserve1, state.reserve0]
+  const amountB = amountA * reserveB / reserveA
+  const liquidityA = amountA * state.totalSupply / reserveA
+  const liquidityB = amountB * state.totalSupply / reserveB
+  const liquidity = liquidityA < liquidityB ? liquidityA : liquidityB
+  const totalSupply = state.totalSupply + liquidity
+  const percentage = BigNumber((100n * liquidity).toString())
+    .div(BigNumber(totalSupply.toString()))
+    .toFixed(5)
+  const result = {
+    amountA: type === 'TokenA' ? amountA : amountB,
+    amountB: type === 'TokenA' ? amountB : amountA,
+    shareAmount: liquidity,
+    sharePercentage: parseFloat(percentage)
+  }
+  return result
+}
+
+function sqrt(y: bigint): bigint {
+  if (y > 3) {
+    let z = y
+    let x = y / 2n + 1n
+    while (x < z) {
+      z = x
+      x = (y / x + x) / 2n
+    }
+    return z
+  }
+  return 1n
+}
+
+function calcSlippageAmount(amount: bigint, isInitial: boolean): bigint {
+  return isInitial ? amount : (amount * 995n) / 1000n
+}
+
+export async function addLiquidity(
+  signer: SignerProvider,
+  sender: string,
+  tokenPairState: TokenPairState,
+  tokenAId: string,
+  tokenBId: string,
+  amountADesired: bigint,
+  amountBDesired: bigint
+): Promise<SignExecuteScriptTxResult> {
+  const isInitial = tokenPairState.reserve0 === 0n && tokenPairState.reserve1 === 0n
+  const amountAMin = calcSlippageAmount(amountADesired, isInitial)
+  const amountBMin = calcSlippageAmount(amountBDesired, isInitial)
+  const deadline = BigInt(Date.now() + DEFAULT_TTL)
+  const script = Script.fromJson(addLiquidityJson)
+  const [amount0Desired, amount1Desired, amount0Min, amount1Min] = tokenAId === tokenPairState.token0Id
+    ? [amountADesired, amountBDesired, amountAMin, amountBMin]
+    : [amountBDesired, amountADesired, amountBMin, amountAMin]
+  const result = await script.execute(signer, {
+    initialFields: {
+      sender: sender,
+      pair: tokenPairState.tokenPairId,
+      amount0Desired: amount0Desired,
+      amount1Desired: amount1Desired,
+      amount0Min: amount0Min,
+      amount1Min: amount1Min,
+      deadline: deadline
+    },
+    tokens: [
+      { id: tokenAId, amount: amountADesired },
+      { id: tokenBId, amount: amountBDesired }
+    ]
+  })
+  await waitTxConfirmed(web3.getCurrentNodeProvider(), result.txId, 1)
+  return result
 }
