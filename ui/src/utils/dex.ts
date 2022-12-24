@@ -11,7 +11,8 @@ import {
   web3
 } from "@alephium/web3"
 import { default as tokenPairContractJson } from "../artifacts/dex/token_pair.ral.json"
-import { default as swapScriptJson } from "../artifacts/scripts/swap.ral.json"
+import { default as swapMinOutScriptJson } from "../artifacts/scripts/swap_min_out.ral.json"
+import { default as swapMaxInScriptJson } from "../artifacts/scripts/swap_max_in.ral.json"
 import { default as addLiquidityJson } from "../artifacts/scripts/add_liquidity.ral.json"
 import { network } from "./consts"
 import BigNumber from "bignumber.js"
@@ -159,7 +160,54 @@ function _getAmountOut(amountIn: bigint, reserveIn: bigint, reserveOut: bigint):
   return result
 }
 
+async function swapMinOut(
+  signer: SignerProvider,
+  sender: string,
+  pairId: string,
+  tokenInId: string,
+  amountIn: bigint,
+  amountOutMin: bigint
+): Promise<SignExecuteScriptTxResult> {
+  const script = Script.fromJson(swapMinOutScriptJson)
+  const result = await script.execute(signer, {
+    initialFields: {
+      sender: sender,
+      pair: pairId,
+      tokenInId: tokenInId,
+      amountIn: amountIn,
+      amountOutMin: amountOutMin
+    },
+    tokens: [{ id: tokenInId, amount: amountIn }]
+  })
+  await waitTxConfirmed(web3.getCurrentNodeProvider(), result.txId, 1)
+  return result
+}
+
+async function swapMaxIn(
+  signer: SignerProvider,
+  sender: string,
+  pairId: string,
+  tokenInId: string,
+  amountInMax: bigint,
+  amountOut: bigint
+): Promise<SignExecuteScriptTxResult> {
+  const script = Script.fromJson(swapMaxInScriptJson)
+  const result = await script.execute(signer, {
+    initialFields: {
+      sender: sender,
+      pair: pairId,
+      tokenInId: tokenInId,
+      amountInMax: amountInMax,
+      amountOut: amountOut
+    },
+    tokens: [{ id: tokenInId, amount: amountInMax }]
+  })
+  await waitTxConfirmed(web3.getCurrentNodeProvider(), result.txId, 1)
+  return result
+}
+
 export async function swap(
+  type: 'ExactInput' | 'ExactOutput',
   signer: SignerProvider,
   sender: string,
   pairId: string,
@@ -167,19 +215,13 @@ export async function swap(
   amountIn: bigint,
   amountOut: bigint
 ): Promise<SignExecuteScriptTxResult> {
-  const script = Script.fromJson(swapScriptJson)
-  const result = await script.execute(signer, {
-    initialFields: {
-      sender: sender,
-      pair: pairId,
-      tokenInId: tokenInId,
-      amountIn: amountIn,
-      amountOut: amountOut
-    },
-    tokens: [{ id: tokenInId, amount: amountIn }]
-  })
-  await waitTxConfirmed(web3.getCurrentNodeProvider(), result.txId, 1)
-  return result
+  if (type === 'ExactInput') {
+    const amountOutMin = (amountOut * 995n) / 1000n
+    return swapMinOut(signer, sender, pairId, tokenInId, amountIn, amountOutMin)
+  }
+
+  const amountInMax = (amountIn * 1005n) / 1000n
+  return swapMaxIn(signer, sender, pairId, tokenInId, amountInMax, amountOut)
 }
 
 function isConfirmed(txStatus: node.TxStatus): txStatus is node.Confirmed {

@@ -264,6 +264,7 @@ function Swap() {
     try {
       setSwapping(true)
       if (
+        lastInput !== undefined &&
         wallet.signer !== undefined &&
         tokenPairState !== undefined &&
         tokenInInfo !== undefined &&
@@ -271,6 +272,7 @@ function Swap() {
         tokenOutAmount !== undefined
       ) {
         const result = await swap(
+          lastInput === 'tokenIn' ? 'ExactInput' : 'ExactOutput',
           wallet.signer.signerProvider,
           wallet.signer.account.address,
           tokenPairState.tokenPairId,
@@ -287,7 +289,7 @@ function Swap() {
       setSwapping(false)
       console.error(`failed to swap, error: ${error}`)
     }
-  }, [wallet, tokenPairState, tokenInInfo, tokenInAmount, tokenOutAmount])
+  }, [lastInput, wallet, tokenPairState, tokenInInfo, tokenInAmount, tokenOutAmount])
 
   const readyToSwap =
     wallet.signer !== undefined &&
