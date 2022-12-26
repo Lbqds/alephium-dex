@@ -13,7 +13,8 @@ import {
 import { default as tokenPairContractJson } from "../artifacts/dex/token_pair.ral.json"
 import { default as swapMinOutScriptJson } from "../artifacts/scripts/swap_min_out.ral.json"
 import { default as swapMaxInScriptJson } from "../artifacts/scripts/swap_max_in.ral.json"
-import { default as addLiquidityJson } from "../artifacts/scripts/add_liquidity.ral.json"
+import { default as addLiquidityScriptJson } from "../artifacts/scripts/add_liquidity.ral.json"
+import { default as removeLiquidityScriptJson } from "../artifacts/scripts/remove_liquidity.ral.json"
 import { network } from "./consts"
 import BigNumber from "bignumber.js"
 
@@ -316,7 +317,7 @@ export async function addLiquidity(
   const amountAMin = calcSlippageAmount(amountADesired, isInitial)
   const amountBMin = calcSlippageAmount(amountBDesired, isInitial)
   const deadline = BigInt(Date.now() + DEFAULT_TTL)
-  const script = Script.fromJson(addLiquidityJson)
+  const script = Script.fromJson(addLiquidityScriptJson)
   const [amount0Desired, amount1Desired, amount0Min, amount1Min] = tokenAId === tokenPairState.token0Id
     ? [amountADesired, amountBDesired, amountAMin, amountBMin]
     : [amountBDesired, amountADesired, amountBMin, amountAMin]
@@ -337,4 +338,73 @@ export async function addLiquidity(
   })
   await waitTxConfirmed(web3.getCurrentNodeProvider(), result.txId, 1)
   return result
+}
+
+export interface RemoveLiquidityResult {
+  token0Id: string
+  amount0: bigint
+  token1Id: string
+  amount1: bigint
+  remainShareAmount: bigint
+  remainSharePercentage: number
+}
+
+export function getRemoveLiquidityResult(
+  tokenPairState: TokenPairState & { totalLiquidityAmount: bigint } , liquidity: bigint
+): RemoveLiquidityResult {
+  if (liquidity > tokenPairState.totalLiquidityAmount) {
+    throw new Error(`not enough balance`)
+  }
+  const amount0 = liquidity * tokenPairState.reserve0 / tokenPairState.totalSupply
+  const amount1 = liquidity * tokenPairState.reserve1 / tokenPairState.totalSupply
+  const remainShareAmount = tokenPairState.totalLiquidityAmount - liquidity
+  const remainSupply = tokenPairState.totalSupply - liquidity
+  const remainSharePercentage = BigNumber((100n * remainShareAmount).toString())
+    .div(BigNumber(remainSupply.toString()))
+    .toFixed(5)
+  return {
+    token0Id: tokenPairState.token0Id,
+    amount0,
+    token1Id: tokenPairState.token1Id,
+    amount1,
+    remainShareAmount,
+    remainSharePercentage: parseFloat(remainSharePercentage)
+  }
+}
+
+export async function removeLiquidity(
+  signer: SignerProvider,
+  sender: string,
+  pairId: string,
+  liquidity: bigint,
+  amount0Desired: bigint,
+  amount1Desired: bigint
+): Promise<SignExecuteScriptTxResult> {
+  const amount0Min = calcSlippageAmount(amount0Desired, false)
+  const amount1Min = calcSlippageAmount(amount1Desired, false)
+  const deadline = BigInt(Date.now() + DEFAULT_TTL)
+  const script = Script.fromJson(removeLiquidityScriptJson)
+  const result = await script.execute(signer, {
+    initialFields: {
+      sender: sender,
+      pairId: pairId,
+      liquidity: liquidity,
+      amount0Min: amount0Min,
+      amount1Min: amount1Min,
+      deadline: deadline
+    },
+    tokens: [{ id: pairId, amount: liquidity }]
+  })
+  await waitTxConfirmed(web3.getCurrentNodeProvider(), result.txId, 1)
+  return result
+}
+
+export function formatRemoveLiquidityResult(result: RemoveLiquidityResult): string {
+  return `Share amount: ${result.remainShareAmount.toString()}, share percentage: ${result.remainSharePercentage}%`
+}
+
+export async function getBalance(tokenId: string, address: string): Promise<bigint> {
+  const balances = await web3.getCurrentNodeProvider().addresses.getAddressesAddressBalance(address)
+  const balance = balances.tokenBalances?.find((balance) => balance.id === tokenId)
+  return balance === undefined ? 0n : BigInt(balance.amount)
 }

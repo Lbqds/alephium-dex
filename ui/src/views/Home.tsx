@@ -5,6 +5,7 @@ import { network } from "../utils/consts";
 import { web3 } from "@alephium/web3";
 import Swap from "../components/Swap";
 import AddLiquidity from "../components/AddLiquidity";
+import RemoveLiquidity from "../components/RemoveLiquidity";
 
 const useStyles = makeStyles((theme) => ({
   spacer: {
@@ -73,6 +74,14 @@ function Home() {
               >
                 Add Liquidity
               </Link>
+              <Link
+                component={NavLink}
+                to="/remove-liquidity"
+                color="inherit"
+                className={classes.link}
+              >
+                Remove Liquidity
+              </Link>
             </div>
           </Hidden>
         </Toolbar>
@@ -83,6 +92,9 @@ function Home() {
         </Route>
         <Route exact path="/add-liquidity">
           <AddLiquidity />
+        </Route>
+        <Route exact path="/remove-liquidity">
+          <RemoveLiquidity />
         </Route>
         <Route>
           <Redirect to="/swap" />
