@@ -7,6 +7,7 @@ import Swap from "../components/Swap";
 import AddLiquidity from "../components/AddLiquidity";
 import RemoveLiquidity from "../components/RemoveLiquidity";
 import useGetDexTokens from "../hooks/useGetDexTokens";
+import AddPool from "../components/AddPool";
 
 const useStyles = makeStyles((theme) => ({
   spacer: {
@@ -84,6 +85,14 @@ function Home() {
               >
                 Remove Liquidity
               </Link>
+              <Link
+                component={NavLink}
+                to="/add-pool"
+                color="inherit"
+                className={classes.link}
+              >
+                Add Pool
+              </Link>
             </div>
           </Hidden>
         </Toolbar>
@@ -97,6 +106,9 @@ function Home() {
         </Route>
         <Route exact path="/remove-liquidity">
           <RemoveLiquidity dexTokens={dexTokens} />
+        </Route>
+        <Route exact path="/add-pool">
+          <AddPool />
         </Route>
         <Route>
           <Redirect to="/swap" />

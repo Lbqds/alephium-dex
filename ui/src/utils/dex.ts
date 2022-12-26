@@ -15,6 +15,7 @@ import { default as swapMinOutScriptJson } from "../artifacts/scripts/swap_min_o
 import { default as swapMaxInScriptJson } from "../artifacts/scripts/swap_max_in.ral.json"
 import { default as addLiquidityScriptJson } from "../artifacts/scripts/add_liquidity.ral.json"
 import { default as removeLiquidityScriptJson } from "../artifacts/scripts/remove_liquidity.ral.json"
+import { default as createPairScriptJson } from "../artifacts/scripts/create_pair.ral.json"
 import { network } from "./consts"
 import BigNumber from "bignumber.js"
 
@@ -407,4 +408,52 @@ export async function getBalance(tokenId: string, address: string): Promise<bigi
   const balances = await web3.getCurrentNodeProvider().addresses.getAddressesAddressBalance(address)
   const balance = balances.tokenBalances?.find((balance) => balance.id === tokenId)
   return balance === undefined ? 0n : BigInt(balance.amount)
+}
+
+export async function tokenPairExist(tokenAId: string, tokenBId: string): Promise<boolean> {
+  const factoryId = network.factoryId
+  const groupIndex = network.groupIndex
+  const [token0Id, token1Id] = sortTokens(tokenAId, tokenBId)
+  const path = token0Id + token1Id
+  const pairContractId = subContractIdWithGroup(factoryId, path, groupIndex)
+  const contractAddress = addressFromContractId(pairContractId)
+  return web3.getCurrentNodeProvider()
+      .addresses
+      .getAddressesAddressGroup(contractAddress)
+      .then(_ => true)
+      .catch((e: any) => {
+        if (e instanceof Error && e.message.indexOf("Group not found") !== -1) {
+          return false
+        }
+        throw e
+      })
+}
+
+export async function createTokenPair(
+  signer: SignerProvider,
+  sender: string,
+  tokenAId: string,
+  tokenBId: string
+): Promise<SignExecuteScriptTxResult & { tokenPairId: string }> {
+  const groupIndex = network.groupIndex
+  const [token0Id, token1Id] = sortTokens(tokenAId, tokenBId)
+  const path = token0Id + token1Id
+  const pairContractId = subContractIdWithGroup(network.factoryId, path, groupIndex)
+  const script = Script.fromJson(createPairScriptJson)
+  const result = await script.execute(signer, {
+    initialFields: {
+      payer: sender,
+      factory: network.factoryId,
+      alphAmount: 10n ** 18n,
+      tokenAId: tokenAId,
+      tokenBId: tokenBId
+    },
+    attoAlphAmount: 10n ** 18n,
+    tokens: [
+      { id: tokenAId, amount: 1n },
+      { id: tokenBId, amount: 1n },
+    ]
+  })
+  await waitTxConfirmed(web3.getCurrentNodeProvider(), result.txId, 1)
+  return { ...result, tokenPairId: pairContractId }
 }
