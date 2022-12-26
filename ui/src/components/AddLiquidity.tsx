@@ -15,7 +15,6 @@ import NumberTextField from "./NumberTextField";
 import { useAlephiumWallet } from "../contexts/AlephiumWalletContext";
 import useIsWalletReady from "../hooks/useIsWalletReady";
 import { COLORS } from "../muiTheme";
-import { network } from "../utils/consts";
 import {
   getAddLiquidityResult,
   getTokenPairState,
@@ -24,10 +23,10 @@ import {
   TokenInfo,
   TokenPairState,
   getInitAddLiquidityResult,
-  formatAddLiquidityResult
+  formatAddLiquidityResult,
+  DexTokens
 } from "../utils/dex";
 import AlephiumWalletKey from "./AlephiumWalletKey";
-import useGetDexTokens from "../hooks/useGetDexTokens";
 
 const useStyles = makeStyles((theme) => ({
   numberField: {
@@ -127,7 +126,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-function AddLiquidity() {
+function AddLiquidity({ dexTokens }: { dexTokens: DexTokens }) {
   const classes = useStyles();
   const [tokenAAmount, setTokenAAmount] = useState<bigint | undefined>(undefined)
   const [tokenBAmount, setTokenBAmount] = useState<bigint | undefined>(undefined)
@@ -141,7 +140,6 @@ function AddLiquidity() {
   const [error, setError] = useState<string | undefined>(undefined)
   const { isReady } = useIsWalletReady();
   const wallet = useAlephiumWallet();
-  const { dexTokens } = useGetDexTokens(network.factoryId)
 
   const handleTokenAChange = useCallback((tokenInfo) => {
     setTokenAInfo(tokenInfo);

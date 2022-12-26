@@ -6,6 +6,7 @@ import { web3 } from "@alephium/web3";
 import Swap from "../components/Swap";
 import AddLiquidity from "../components/AddLiquidity";
 import RemoveLiquidity from "../components/RemoveLiquidity";
+import useGetDexTokens from "../hooks/useGetDexTokens";
 
 const useStyles = makeStyles((theme) => ({
   spacer: {
@@ -45,6 +46,7 @@ const useStyles = makeStyles((theme) => ({
 function Home() {
   const classes = useStyles();
   web3.setCurrentNodeProvider(network.nodeHost)
+  const { dexTokens } = useGetDexTokens(network.factoryId)
 
   return (
     <div className={classes.bg}>
@@ -88,13 +90,13 @@ function Home() {
       </AppBar>
       <Switch>
         <Route exact path="/swap">
-          <Swap />
+          <Swap dexTokens={dexTokens} />
         </Route>
         <Route exact path="/add-liquidity">
-          <AddLiquidity />
+          <AddLiquidity dexTokens={dexTokens} />
         </Route>
         <Route exact path="/remove-liquidity">
-          <RemoveLiquidity />
+          <RemoveLiquidity dexTokens={dexTokens} />
         </Route>
         <Route>
           <Redirect to="/swap" />
