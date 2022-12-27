@@ -187,4 +187,28 @@ program
     }
   })
 
+program
+  .command('transfer-tokens')
+  .description('transfer test tokens on devnet')
+  .requiredOption('--to <string>', 'to address')
+  .requiredOption('--token-id <string>', 'token id')
+  .requiredOption('--amount <string>', 'trasfer amount')
+  .action(async (opts) => {
+    const env = await getEnv()
+    const signer = PrivateKeyWallet.FromMnemonic(env.network.mnemonic)
+    const transferAmount = BigInt(opts.amount as string)
+    const result = await signer.signAndSubmitTransferTx({
+      signerAddress: signer.address,
+      destinations: [
+        {
+          address: opts.to as string,
+          attoAlphAmount: 10n ** 18n,
+          tokens: [{ id: opts.tokenId as string, amount: transferAmount }]
+        }
+      ]
+    })
+    await waitTxConfirmed(web3.getCurrentNodeProvider(), result.txId, 1)
+    console.log(`transfer succeed, tx id: ${result.txId}`)
+  })
+
 program.parse()
