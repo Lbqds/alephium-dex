@@ -28,7 +28,8 @@
     "@alephium/web3": "0.2.2",
     "@alephium/web3-test": "0.2.2",
     "@alephium/web3-wallet": "0.2.2",
-    "bignumber.js": "^9.1.1"
+    "bignumber.js": "^9.1.1",
+    "commander": "^9.4.0"
   },
   "devDependencies": {
     "@types/elliptic": "^6.4.13",

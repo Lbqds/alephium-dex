@@ -1,6 +1,7 @@
 import { getEnv } from '@alephium/cli'
 import { binToHex, contractIdFromAddress, node, NodeProvider, Project, SignerProvider, web3 } from '@alephium/web3'
 import { PrivateKeyWallet } from '@alephium/web3-wallet'
+import { program } from 'commander'
 import { randomInt } from 'crypto'
 import { default as devnetDeployment } from '../.deployments.devnet.json'
 
@@ -161,18 +162,29 @@ export async function getCreatedContractId(provider: NodeProvider, txId: string,
   return binToHex(contractIdFromAddress(address))
 }
 
-async function createTestTokensOnDevnet(num: number, addLiquidity: boolean) {
-  const env = await getEnv()
-  const signer = PrivateKeyWallet.FromMnemonic(env.network.mnemonic)
+program
+  .command('create-tokens')
+  .description('create test tokens on devnet')
+  .requiredOption('-n, --num <number>', 'token number')
+  .option('--create-pair', 'create token pairs', false)
+  .option('--init', 'add init liquidity for token pairs', false)
+  .action(async (opts) => {
+    const tokenNumber = opts.num as number
+    const env = await getEnv()
+    const signer = PrivateKeyWallet.FromMnemonic(env.network.mnemonic)
 
-  const factoryId = devnetDeployment[0].deployContractResults.TokenPairFactory.contractId
-  const tokenIds = await createTokens(signer, num)
-  const tokenPairs = await createPairs(signer, factoryId, tokenIds)
+    const factoryId = devnetDeployment[0].deployContractResults.TokenPairFactory.contractId
+    const tokenIds = await createTokens(signer, tokenNumber)
+    if (opts.createPair && opts.init) {
+      const tokenPairs = await createPairs(signer, factoryId, tokenIds)
+      const ratios = calcRatios(tokenIds)
+      await addInitialLiquidity(signer, tokenPairs, ratios)
+      return
+    }
 
-  if (addLiquidity) {
-    const ratios = calcRatios(tokenIds)
-    await addInitialLiquidity(signer, tokenPairs, ratios)
-  }
-}
+    if (opts.createPair) {
+      await createPairs(signer, factoryId, tokenIds)
+    }
+  })
 
-createTestTokensOnDevnet(5, true)
+program.parse()
