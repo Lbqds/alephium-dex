@@ -175,11 +175,14 @@ function AddLiquidity({ dexTokens }: { dexTokens: DexTokens }) {
           const addLiquidityResult = getAddLiquidityResult(tokenPairState, tokenAInfo.tokenId, tokenAAmount, 'TokenA')
           setTokenBAmount(addLiquidityResult.amountB)
           setAddLiquidityResult(addLiquidityResult)
-        }
-        if (lastInput === 'tokenB' && tokenBAmount !== undefined) {
+        } else if (lastInput === 'tokenB' && tokenBAmount !== undefined) {
           const addLiquidityResult = getAddLiquidityResult(tokenPairState, tokenBInfo.tokenId, tokenBAmount, 'TokenB')
           setTokenAAmount(addLiquidityResult.amountA)
           setAddLiquidityResult(addLiquidityResult)
+        } else {
+          setTokenAAmount(undefined)
+          setTokenBAmount(undefined)
+          setAddLiquidityResult(undefined)
         }
       }
     } catch (error) {
@@ -195,7 +198,6 @@ function AddLiquidity({ dexTokens }: { dexTokens: DexTokens }) {
         setLastInput('tokenA')
         if (event.target.value === '') {
           setTokenAAmount(undefined)
-          setTokenBAmount(undefined)
           return
         }
         const amountIn = BigInt(event.target.value)
@@ -214,7 +216,6 @@ function AddLiquidity({ dexTokens }: { dexTokens: DexTokens }) {
         setLastInput('tokenB')
         if (event.target.value === '') {
           setTokenBAmount(undefined)
-          setTokenAAmount(undefined)
           return
         }
         const amountOut = BigInt(event.target.value)
