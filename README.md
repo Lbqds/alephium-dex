@@ -1,4 +1,4 @@
-# My dApp Template
+# Alephium DEX
 
 ## Install
 
@@ -8,26 +8,28 @@ npm install
 
 ## Start a local devnet for testing and development
 
-```
-npx @alephium/cli@latest devnet start
-```
+The minimum required full node version: 1.6.0-rc0
 
-## Compile
-
-Compile the TypeScript files into JavaScript:
+## Deploy dex contracts
 
 ```
-npx @alephium/cli@latest compile 
+npx @alephium/cli deploy -n devnet
 ```
 
-## Stop/restart devnet
+## Create test tokens on devnet
 
 ```
-npx @alephium/cli@latest devnet stop
+npx ts-node scripts/devnet.ts create-tokens -n 5
 ```
 
-## Testing
+It will create 5 test tokens on devnet
+
+## UI
 
 ```
-npx @alephium/cli@latest test
+cd ui
+npm install
+npm run build
+npm run start
 ```
+
