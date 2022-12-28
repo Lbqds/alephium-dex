@@ -86,11 +86,6 @@ export function tokenPairContract(): Contract {
   return Contract.fromJson(tokenPairContractJson)
 }
 
-export function subContractIdWithGroup(parentContractId: string, path: string, groupIndex: number): string {
-  const contractId = subContractId(parentContractId, path)
-  return contractId.slice(0, -2) + groupIndex.toString(16).padStart(2, '0')
-}
-
 export function sortTokens(tokenAId: string, tokenBId: string): [string, string] {
   const tokenA = BigInt('0x' + tokenAId)
   const tokenB = BigInt('0x' + tokenBId)
@@ -111,7 +106,7 @@ export async function getTokenPairState(tokenAId: string, tokenBId: string): Pro
   const groupIndex = network.groupIndex
   const [token0Id, token1Id] = sortTokens(tokenAId, tokenBId)
   const path = token0Id + token1Id
-  const pairContractId = subContractIdWithGroup(factoryId, path, groupIndex)
+  const pairContractId = subContractId(factoryId, path, groupIndex)
   const contractAddress = addressFromContractId(pairContractId)
   const state = await tokenPairContract().fetchState(contractAddress, groupIndex)
   return {
@@ -415,7 +410,7 @@ export async function tokenPairExist(tokenAId: string, tokenBId: string): Promis
   const groupIndex = network.groupIndex
   const [token0Id, token1Id] = sortTokens(tokenAId, tokenBId)
   const path = token0Id + token1Id
-  const pairContractId = subContractIdWithGroup(factoryId, path, groupIndex)
+  const pairContractId = subContractId(factoryId, path, groupIndex)
   const contractAddress = addressFromContractId(pairContractId)
   return web3.getCurrentNodeProvider()
       .addresses
@@ -438,7 +433,7 @@ export async function createTokenPair(
   const groupIndex = network.groupIndex
   const [token0Id, token1Id] = sortTokens(tokenAId, tokenBId)
   const path = token0Id + token1Id
-  const pairContractId = subContractIdWithGroup(network.factoryId, path, groupIndex)
+  const pairContractId = subContractId(network.factoryId, path, groupIndex)
   const script = Script.fromJson(createPairScriptJson)
   const result = await script.execute(signer, {
     initialFields: {
