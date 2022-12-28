@@ -8,7 +8,9 @@ npm install
 
 ## Start a local devnet for testing and development
 
-The minimum required full node version: 1.6.0-rc0
+```
+npx @alephium/cli devnet start
+```
 
 ## Deploy dex contracts
 
