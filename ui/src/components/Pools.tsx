@@ -117,7 +117,13 @@ function Pools({ dexTokens }: { dexTokens: DexTokens }) {
   const classes = useStyles();
   const [error, setError] = useState<string | undefined>(undefined)
 
-  const tokenLists = dexTokens.tokenPairs.map((tokenPair) => <ListTokenPair tokenPair={tokenPair} onError={(err: any) => setError(err)}/>)
+  const tokenLists = dexTokens.tokenPairs.map((tokenPair) =>
+    <ListTokenPair
+      key={tokenPair.tokenPairId}
+      tokenPair={tokenPair}
+      onError={(err: any) => setError(err)}
+    />
+  )
 
   return (
     <Container className={classes.centeredContainer}>

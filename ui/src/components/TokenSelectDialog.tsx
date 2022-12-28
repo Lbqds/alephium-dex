@@ -125,6 +125,7 @@ export default function TokenSelectDialog({
   const info = dexTokens.tokenInfos.find((x) => x.tokenAddress === tokenAddress);
   const availableTokens = dexTokens.getAllowedTokenInfos(counterpart).map((token) =>
     <TokenOptions
+      key={token.tokenAddress}
       tokenInfo={token}
       onSelect={onChange}
       close={handleClose}
