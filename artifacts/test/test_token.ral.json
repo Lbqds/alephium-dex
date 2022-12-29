@@ -1,0 +1,33 @@
+{
+  "version": "v1.6.0",
+  "name": "TestToken",
+  "bytecode": "00010c0102020200041600b11601ab",
+  "codeHash": "91722e86ab62da0ee5b2c025a85635492d0ffff6da693a4800af7d01d5863afc",
+  "fieldsSig": {
+    "names": [],
+    "types": [],
+    "isMutable": []
+  },
+  "eventsSig": [],
+  "functions": [
+    {
+      "name": "getToken",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": true,
+      "isPublic": true,
+      "paramNames": [
+        "sender",
+        "amount"
+      ],
+      "paramTypes": [
+        "Address",
+        "U256"
+      ],
+      "paramIsMutable": [
+        false,
+        false
+      ],
+      "returnTypes": []
+    }
+  ]
+}

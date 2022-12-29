@@ -1,5 +1,6 @@
 TxScript AddLiquidity(
   sender: Address,
+  router: Router,
   pair: TokenPair,
   amount0Desired: U256,
   amount1Desired: U256,
@@ -8,7 +9,7 @@ TxScript AddLiquidity(
   deadline: U256
 ) {
   let (token0Id, token1Id) = pair.getTokenPair()
-  pair.addLiquidity{sender -> token0Id: amount0Desired, token1Id: amount1Desired}(
-    sender, amount0Desired, amount1Desired, amount0Min, amount1Min, deadline
+  router.addLiquidity{sender -> token0Id: amount0Desired, token1Id: amount1Desired}(
+    pair, sender, amount0Desired, amount1Desired, amount0Min, amount1Min, deadline
   )
 }

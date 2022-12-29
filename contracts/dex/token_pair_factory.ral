@@ -3,7 +3,6 @@ Contract TokenPairFactory(
   pairTemplateId: ByteVec, // the template contract id of `TokenPair`
   mut pairSize: U256
 ) extends Constants() {
-
   event PairCreated(token0: ByteVec, token1: ByteVec, pair: ByteVec, currentPairSize: U256)
 
   fn sortTokens(tokenA: ByteVec, tokenB: ByteVec) -> (ByteVec, ByteVec) {

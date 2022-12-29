@@ -43,38 +43,8 @@ Contract TokenPair(
     blockTimeStampLast = blockTimeStampSecond
   }
 
-  fn getInputAmount(
-    amount0Desired: U256,
-    amount1Desired: U256,
-    amount0Min: U256,
-    amount1Min: U256
-  ) -> (U256, U256) {
-    if (reserve0 == 0 && reserve1 == 0) {
-      return amount0Desired, amount1Desired
-    }
-
-    let amount1Optimal = amount0Desired * reserve1 / reserve0
-    if (amount1Optimal <= amount1Desired) {
-      assert!(amount1Optimal >= amount1Min, ErrorCodes.InsufficientToken1Amount)
-      return amount0Desired, amount1Optimal
-    }
-
-    let amount0Optimal = amount1Desired * reserve0 / reserve1
-    assert!(amount0Optimal >= amount0Min && amount0Optimal <= amount0Desired, ErrorCodes.InsufficientToken0Amount)
-    return amount0Optimal, amount1Desired
-  }
-
-  @using(preapprovedAssets = true, assetsInContract = true, updateFields = true)
-  pub fn addLiquidity(
-    sender: Address,
-    amount0Desired: U256,
-    amount1Desired: U256,
-    amount0Min: U256,
-    amount1Min: U256,
-    deadline: U256
-  ) -> () {
-    assert!(deadline >= blockTimeStamp!(), ErrorCodes.Expired)
-    let (amount0, amount1) = getInputAmount(amount0Desired, amount1Desired, amount0Min, amount1Min)
+  @using(preapprovedAssets = true, assetsInContract = true, updateFields = true, externalCallCheck = false)
+  pub fn mint(sender: Address, amount0: U256, amount1: U256) -> U256 {
     let mut liquidity = 0
     if (totalSupply == 0) {
       let initLiquidity = sqrt(amount0 * amount1)
@@ -98,22 +68,14 @@ Contract TokenPair(
     transferTokenToSelf!(sender, token1Id, amount1)
 
     emit Mint(sender, amount0, amount1, liquidity)
+    return liquidity
   }
 
-  @using(preapprovedAssets = true, assetsInContract = true, updateFields = true)
-  pub fn removeLiquidity(
-    sender: Address,
-    liquidity: U256,
-    amount0Min: U256,
-    amount1Min: U256,
-    deadline: U256
-  ) -> () {
-    assert!(deadline >= blockTimeStamp!(), ErrorCodes.Expired)
+  @using(preapprovedAssets = true, assetsInContract = true, updateFields = true, externalCallCheck = false)
+  pub fn burn(sender: Address, liquidity: U256) -> (U256, U256) {
     let amount0 = liquidity * reserve0 / totalSupply
     let amount1 = liquidity * reserve1 / totalSupply
     assert!(amount0 > 0 && amount1 > 0, ErrorCodes.InsufficientLiquidityBurned)
-    assert!(amount0 >= amount0Min, ErrorCodes.InsufficientToken0Amount)
-    assert!(amount1 >= amount1Min, ErrorCodes.InsufficientToken1Amount)
 
     totalSupply = totalSupply - liquidity
     update(reserve0 - amount0, reserve1 - amount1)
@@ -123,9 +85,10 @@ Contract TokenPair(
     transferTokenFromSelf!(sender, token1Id, amount1)
 
     emit Burn(sender, amount0, amount1, liquidity)
+    return amount0, amount1
   }
 
-  @using(preapprovedAssets = true, assetsInContract = true)
+  @using(preapprovedAssets = true, assetsInContract = true, externalCallCheck = false)
   pub fn swap(sender: Address, tokenInId: ByteVec, amountIn: U256, amountOut: U256) -> () {
     assert!(isAssetAddress!(sender), ErrorCodes.InvalidToAddress)
     assert!(amountOut > 0, ErrorCodes.InsufficientOutputAmount)
