@@ -53,9 +53,6 @@ const useStyles = makeStyles((theme) => ({
     margin: ".5rem",
     fontSize: "15px"
   },
-  listItemIcon: {
-    width: 100
-  },
   icon: {
     height: 20,
     maxWidth: 20,
@@ -88,8 +85,8 @@ const TokenOptions = ({
   }, [tokenInfo, onSelect, close]);
 
   return (
-    <ListItem button onClick={handleClick} key={tokenInfo.tokenAddress}>
-      <ListItemIcon className={classes.listItemIcon}>
+    <ListItem button onClick={handleClick} key={tokenInfo.tokenId}>
+      <ListItemIcon>
         <img
           // TODO: set logo properly
           src={alephiumIcon}
@@ -98,7 +95,7 @@ const TokenOptions = ({
         />
       </ListItemIcon>
       <ListItemText>
-        <Box fontFamily="Monospace" fontWeight="fontWeightMedium">{tokenInfo.tokenAddress}</Box>
+        <Box fontFamily="Monospace" fontWeight="fontWeightMedium">{tokenInfo.tokenId}</Box>
       </ListItemText>
     </ListItem>
   );
@@ -125,7 +122,7 @@ export default function TokenSelectDialog({
   const info = dexTokens.tokenInfos.find((x) => x.tokenAddress === tokenAddress);
   const availableTokens = dexTokens.getAllowedTokenInfos(counterpart).map((token) =>
     <TokenOptions
-      key={token.tokenAddress}
+      key={token.tokenId}
       tokenInfo={token}
       onSelect={onChange}
       close={handleClose}
@@ -161,7 +158,7 @@ export default function TokenSelectDialog({
           )
         }
       </Card>
-      <Dialog open={open} onClose={handleClose}>
+      <Dialog open={open} onClose={handleClose} maxWidth='md'>
         <DialogTitle>
           <div className={classes.flexTitle}>
             <div>Select token</div>
