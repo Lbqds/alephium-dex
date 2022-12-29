@@ -115,6 +115,11 @@ function AddPool() {
   useEffect(() => {
     setError(undefined)
     if (tokenAId !== undefined && tokenBId !== undefined) {
+      if (tokenAId === tokenBId) {
+        setError('identical token ids')
+        return
+      }
+
       tokenPairExist(tokenAId, tokenBId)
         .then((exist) => {
           if (exist) setError(`token pair already exist`)
@@ -125,6 +130,7 @@ function AddPool() {
 
   const handleTokenAChange = useCallback(
     (event) => {
+      setError(undefined)
       if (event.target.value === '') {
         setTokenAId(undefined)
         return
@@ -135,6 +141,7 @@ function AddPool() {
 
   const handleTokenBChange = useCallback(
     (event) => {
+      setError(undefined)
       if (event.target.value === '') {
         setTokenBId(undefined)
         return
