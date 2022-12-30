@@ -192,8 +192,8 @@ function RemoveLiquidity({ dexTokens }: { dexTokens: DexTokens }) {
         amount !== undefined &&
         totalLiquidityAmount !== undefined
       ) {
-        const removeLiqiudityResult = getRemoveLiquidityResult({ ...tokenPairState, totalLiquidityAmount }, amount)
-        setRemoveLiquidityResult(removeLiqiudityResult)
+        const result = getRemoveLiquidityResult({ ...tokenPairState, totalLiquidityAmount }, amount)
+        setRemoveLiquidityResult(result)
       }
     } catch (error) {
       setError(`${error}`)
@@ -280,8 +280,8 @@ function RemoveLiquidity({ dexTokens }: { dexTokens: DexTokens }) {
           wallet.signer.account.address,
           tokenPairState.tokenPairId,
           amount,
-          tokenAInfo.tokenId === tokenPairState.token0Id ? removeLiquidityResult.amount0 : removeLiquidityResult.amount1,
-          tokenAInfo.tokenId === tokenPairState.token0Id ? removeLiquidityResult.amount1 : removeLiquidityResult.amount0,
+          removeLiquidityResult.amount0,
+          removeLiquidityResult.amount1
         )
         console.log(`remove liquidity succeed, tx id: ${result.txId}`)
         setCompleted(true)
