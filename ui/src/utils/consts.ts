@@ -5,6 +5,7 @@ export interface Network {
   networkId: number
   groupIndex: number
   factoryId: string
+  routerId: string
 }
 
 export interface Settings {
@@ -21,7 +22,8 @@ export const networks: Record<NetworkName, Network> = {
     explorerUrl: 'https://explorer.alephium.org',
     networkId: 0,
     groupIndex: 0,
-    factoryId: ''
+    factoryId: '',
+    routerId: ''
   },
   testnet: {
     nodeHost: 'https://testnet-wallet.alephium.org',
@@ -29,7 +31,8 @@ export const networks: Record<NetworkName, Network> = {
     explorerUrl: 'https://testnet.alephium.org',
     networkId: 1,
     groupIndex: 0,
-    factoryId: ''
+    factoryId: '',
+    routerId: ''
   },
   devnet: {
     nodeHost: 'http://localhost:22973',
@@ -37,7 +40,8 @@ export const networks: Record<NetworkName, Network> = {
     explorerUrl: 'http://localhost:3000',
     networkId: 4,
     groupIndex: 0,
-    factoryId: '430feb00627cd3a327da09f2f141116c279020d1926f03bc43faf8bca88c5100' // TODO: load from deployments file
+    factoryId: '3e5a6183fe70ba39ed6aa4c8f6b29605012ba54b7926078701bdd3dcb3896f00', // TODO: load from deployments file
+    routerId: 'a18c0679b92ede5e1698ec2edde63ecbe1324f9cd452b94ffc00693cb3a37300'
   }
 }
 

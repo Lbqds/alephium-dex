@@ -169,10 +169,12 @@ async function swapMinOut(
   const result = await script.execute(signer, {
     initialFields: {
       sender: sender,
+      router: network.routerId,
       pair: pairId,
       tokenInId: tokenInId,
       amountIn: amountIn,
-      amountOutMin: amountOutMin
+      amountOutMin: amountOutMin,
+      deadline: BigInt(Date.now() + DEFAULT_TTL)
     },
     tokens: [{ id: tokenInId, amount: amountIn }]
   })
@@ -192,10 +194,12 @@ async function swapMaxIn(
   const result = await script.execute(signer, {
     initialFields: {
       sender: sender,
+      router: network.routerId,
       pair: pairId,
       tokenInId: tokenInId,
       amountInMax: amountInMax,
-      amountOut: amountOut
+      amountOut: amountOut,
+      deadline: BigInt(Date.now() + DEFAULT_TTL)
     },
     tokens: [{ id: tokenInId, amount: amountInMax }]
   })
@@ -320,6 +324,7 @@ export async function addLiquidity(
   const result = await script.execute(signer, {
     initialFields: {
       sender: sender,
+      router: network.routerId,
       pair: tokenPairState.tokenPairId,
       amount0Desired: amount0Desired,
       amount1Desired: amount1Desired,
@@ -383,6 +388,7 @@ export async function removeLiquidity(
   const result = await script.execute(signer, {
     initialFields: {
       sender: sender,
+      router: network.routerId,
       pairId: pairId,
       liquidity: liquidity,
       amount0Min: amount0Min,
