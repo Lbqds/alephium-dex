@@ -111,6 +111,7 @@ async function addInitialLiquidity(
   const script = Project.script('AddLiquidity')
   const account = await signer.getSelectedAccount()
   const nodeProvider = signer.nodeProvider ?? web3.getCurrentNodeProvider()
+  const routerId = devnetDeployment[0].deployContractResults.Router.contractId
   for (let index = 0; index < tokenPairs.length; index++) {
     const tokenPair = tokenPairs[index]
     const ratio = ratios.get(tokenPair.token0Id + tokenPair.token1Id) as bigint
@@ -119,6 +120,7 @@ async function addInitialLiquidity(
     const result = await script.execute(signer, {
       initialFields: {
         sender: account.address,
+        router: routerId,
         pair: tokenPair.tokenPairId,
         amount0Desired: token0Amount,
         amount1Desired: token1Amount,
