@@ -1,23 +1,29 @@
 {
-  "version": "v1.5.5",
+  "version": "v1.6.0",
   "name": "SwapMinOut",
-  "bytecodeTemplate": "02010300040040290c0e{1}01021817000c0e{1}010317021701{2}1600414c041601160200014a0316021601000117031603{4}340c7b{0}{2}{3}a3{0}{2}{3}1603100c{1}01080000020501121343e5{3}2c1702160216012c170316021343e816002c2a1704160316042d02",
+  "bytecodeTemplate": "0101030000000e{0}{3}{4}a3{2}{0}{3}{4}{5}{6}13060c{1}0104",
   "fieldsSig": {
     "names": [
       "sender",
+      "router",
       "pair",
       "tokenInId",
       "amountIn",
-      "amountOutMin"
+      "amountOutMin",
+      "deadline"
     ],
     "types": [
       "Address",
       "ByteVec",
       "ByteVec",
+      "ByteVec",
+      "U256",
       "U256",
       "U256"
     ],
     "isMutable": [
+      false,
+      false,
       false,
       false,
       false,
@@ -35,27 +41,6 @@
       "paramTypes": [],
       "paramIsMutable": [],
       "returnTypes": []
-    },
-    {
-      "name": "getAmountOut",
-      "usePreapprovedAssets": false,
-      "useAssetsInContract": false,
-      "isPublic": false,
-      "paramNames": [
-        "reserveIn",
-        "reserveOut"
-      ],
-      "paramTypes": [
-        "U256",
-        "U256"
-      ],
-      "paramIsMutable": [
-        false,
-        false
-      ],
-      "returnTypes": [
-        "U256"
-      ]
     }
   ]
 }

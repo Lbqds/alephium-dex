@@ -8,14 +8,20 @@
     "ignoreExternalCallCheckWarnings": false
   },
   "infos": {
-    "contracts/dex/token_pair.ral": {
-      "sourceCodeHash": "6e068b34ae999572610da7b2b722b9610a8b7bb77fb9a1a3a30f7300ca9eb723",
+    "contracts/dex/router.ral": {
+      "sourceCodeHash": "d9d05cf3c6d6b8d24e20f5bfb05a0711e3d6d616cc5e597bbe03a62a33f3acd7",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "15d64db57fe5bca873c59bf9f2f7c279d21850682e49f8120d6ce961ccdc09b9",
+      "codeHashDebug": "b7841c558f6eb55717fe143395745defa7a60d9137bb9f50ee08883db31d5999",
+      "warnings": []
+    },
+    "contracts/dex/token_pair.ral": {
+      "sourceCodeHash": "90c064dbca4d4dc284b048f3fbb3743e915fe68d371ac48eb160fb3587466ed3",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "c3a236450cadd2b6785cea64133501575e9fcc268ed3d117c0b913c54efcbec4",
       "warnings": []
     },
     "contracts/dex/token_pair_factory.ral": {
-      "sourceCodeHash": "1891bcb35b49ee83b2f63b31a22cab58f7ee69f4c479a80a16ee3a0a4cabb8f2",
+      "sourceCodeHash": "8c9219be7404083b7523638ebb6cd1c4ebee3e55debf74e6e5e064b3aec27fba",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "d1f34163842b3ca5e95e9de955757d15185ac6ce120a9c5393a5bbf9bfcd6483",
       "warnings": []
@@ -26,8 +32,14 @@
       "codeHashDebug": "085c8183210ec7296681e12ab74e37bebee9d495e78e24cc9b3cd1b110d6df2a",
       "warnings": []
     },
+    "contracts/test/test_token.ral": {
+      "sourceCodeHash": "dd68389cff26532047122058088114f8d60217026696536b5a0bb8a90a9b39d9",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "91722e86ab62da0ee5b2c025a85635492d0ffff6da693a4800af7d01d5863afc",
+      "warnings": []
+    },
     "contracts/scripts/add_liquidity.ral": {
-      "sourceCodeHash": "973ac29f8aae5938d2d6f02c6313fedf8a0d4be4eb2b831d1024e2ab3707cfbe",
+      "sourceCodeHash": "ae7c7a47ec7728436f5b56c039f277705fe3a71e64709d6ba40d8d802e3f6fbe",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
@@ -39,7 +51,7 @@
       "warnings": []
     },
     "contracts/scripts/remove_liquidity.ral": {
-      "sourceCodeHash": "1dabfe01501208c799b66a5347154d9a0a3a7d3987ac711bd3b5d45402eb95d4",
+      "sourceCodeHash": "a37e6c625f753ee67a3ac20bd4d71d19985d1a34381acf8833ea2a193378eb2e",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
@@ -51,13 +63,19 @@
       "warnings": []
     },
     "contracts/scripts/swap_max_in.ral": {
-      "sourceCodeHash": "1eae9ada99a79141a6361e20273b7af32b077f15d31f2df0bb79e6b514429f31",
+      "sourceCodeHash": "ba54225b64982849977234332fa81f9c528d922783ac704c75c7f40cdc50498c",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
     },
     "contracts/scripts/swap_min_out.ral": {
-      "sourceCodeHash": "92515a08ace370813891123bd9271d8cc4c4cdc16ea1521b4aec12f5a6082904",
+      "sourceCodeHash": "9b4c858f4e1185965f6c81832f2d4f7836dd8d0573b1f5b4ef32efc40ccb8107",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "",
+      "warnings": []
+    },
+    "contracts/test/get_token.ral": {
+      "sourceCodeHash": "1e61b4573ed08acb31d54177295b4388e17c6f927a7fe0da74af032e9daed4dc",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []

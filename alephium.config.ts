@@ -1,7 +1,7 @@
 import { Configuration } from '@alephium/cli'
 
 const configuration: Configuration<undefined> = {
-  artifactDir: '../sdk/js/src/alephium/artifacts',
+  artifactDir: 'ui/src/artifacts',
 
   defaultNetwork: 'devnet',
   toDeployGroups: [0],

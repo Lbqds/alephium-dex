@@ -1,23 +1,29 @@
 {
-  "version": "v1.5.5",
+  "version": "v1.6.0",
   "name": "SwapMaxIn",
-  "bytecodeTemplate": "02010300040040290c0e{1}01021817000c0e{1}010317021701{2}1600414c041601160200014a0316021601000117031603{3}320c7b{0}{2}1603a3{0}{2}1603{4}100c{1}01080000020401121600{4}2c1343e82c17021601{4}2b1343e52c1703160216032d0d2a02",
+  "bytecodeTemplate": "0101030000000e{0}{3}{4}a3{2}{0}{3}{4}{5}{6}13060c{1}0105",
   "fieldsSig": {
     "names": [
       "sender",
+      "router",
       "pair",
       "tokenInId",
       "amountInMax",
-      "amountOut"
+      "amountOut",
+      "deadline"
     ],
     "types": [
       "Address",
       "ByteVec",
       "ByteVec",
+      "ByteVec",
+      "U256",
       "U256",
       "U256"
     ],
     "isMutable": [
+      false,
+      false,
       false,
       false,
       false,
@@ -35,27 +41,6 @@
       "paramTypes": [],
       "paramIsMutable": [],
       "returnTypes": []
-    },
-    {
-      "name": "getAmountIn",
-      "usePreapprovedAssets": false,
-      "useAssetsInContract": false,
-      "isPublic": false,
-      "paramNames": [
-        "reserveIn",
-        "reserveOut"
-      ],
-      "paramTypes": [
-        "U256",
-        "U256"
-      ],
-      "paramIsMutable": [
-        false,
-        false
-      ],
-      "returnTypes": [
-        "U256"
-      ]
     }
   ]
 }

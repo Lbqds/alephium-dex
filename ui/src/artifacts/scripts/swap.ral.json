@@ -1,7 +1,7 @@
 {
-  "version": "v1.5.5",
+  "version": "v1.6.0",
   "name": "Swap",
-  "bytecodeTemplate": "0101030000000c{0}{2}{3}a3{0}{2}{3}{4}100c{1}0108",
+  "bytecodeTemplate": "0101030000000c{0}{2}{3}a3{0}{2}{3}{4}100c{1}0107",
   "fieldsSig": {
     "names": [
       "sender",
