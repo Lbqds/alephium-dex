@@ -5,7 +5,7 @@ import {
   contractIdFromAddress,
   ContractState,
   Project,
-  subContractId
+  Token
 } from '@alephium/web3'
 import { randomBytes } from 'crypto'
 import * as base58 from 'bs58'
@@ -16,7 +16,6 @@ export const maxAlphAmount = 10n ** 18n * 1000000000n
 export const gasPrice = 100000000000n
 export const maxGasPerTx = 625000n
 export const defaultGasFee = gasPrice * maxGasPerTx
-export const alphTokenId = ''.padStart(64, '0')
 
 export enum ErrorCodes {
   ReserveOverflow,
@@ -105,12 +104,6 @@ export function randomTokenPair(): [string, string] {
   return sortTokens(randomTokenId(), randomTokenId())
 }
 
-// TODO: remove this
-export function subContractIdWithGroup(parentContractId: string, path: string, groupIndex: number): string {
-  const contractId = subContractId(parentContractId, path)
-  return contractId.slice(0, -2) + groupIndex.toString(16).padStart(2, '0')
-}
-
 export function bigintToHex(num: bigint): string {
   return num.toString(16).padStart(64, '0')
 }
@@ -166,4 +159,16 @@ export function createTokenPairFactory(): ContractInfo {
     address
   )
   return new ContractInfo(contract, contractState, pairTemplate.states(), address)
+}
+
+export function createRouter(): ContractInfo {
+  const contract = Project.contract('Router')
+  const address = randomContractAddress()
+  const contractState = contract.toState({}, { alphAmount: oneAlph }, address)
+  return new ContractInfo(contract, contractState, [], address)
+}
+
+export function expectTokensEqual(expected: Token[], have: Token[]) {
+  expect(expected.length).toEqual(have.length)
+  expected.forEach((t) => expect(have.some((v) => v.amount === t.amount && v.id === t.id)).toEqual(true))
 }

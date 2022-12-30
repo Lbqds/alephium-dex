@@ -1,0 +1,352 @@
+import { ContractState, Number256, web3 } from '@alephium/web3'
+import { expectAssertionError } from '@alephium/web3-test'
+import {
+  buildProject,
+  createRouter,
+  createTokenPair,
+  ErrorCodes,
+  expectTokensEqual,
+  oneAlph,
+  randomP2PKHAddress,
+  randomTokenPair
+} from './fixtures/DexFixture'
+import { mint } from './TokenPair.test'
+
+describe('test router', () => {
+  web3.setCurrentNodeProvider('http://127.0.0.1:22973')
+
+  test('addLiquidity_', async () => {
+    await buildProject()
+
+    const contractInfo = createRouter()
+    async function test(
+      reserve0: bigint,
+      reserve1: bigint,
+      amount0Desired: bigint,
+      amount1Desired: bigint,
+      amount0Min: bigint,
+      amount1Min: bigint
+    ): Promise<[bigint, bigint]> {
+      const result = await contractInfo.contract.testPrivateMethod('addLiquidity_', {
+        initialFields: contractInfo.selfState.fields,
+        address: contractInfo.address,
+        existingContracts: contractInfo.dependencies,
+        testArgs: {
+          reserve0: reserve0,
+          reserve1: reserve1,
+          amount0Desired: amount0Desired,
+          amount1Desired: amount1Desired,
+          amount0Min: amount0Min,
+          amount1Min: amount1Min
+        }
+      })
+      expect(result.returns.length).toEqual(2)
+      return [result.returns[0] as Number256, result.returns[1] as Number256]
+    }
+
+    expect(await test(0n, 0n, 100n, 200n, 80n, 160n)).toEqual([100n, 200n])
+    expect(await test(1000n, 3000n, 1000n, 3000n, 1000n, 3000n)).toEqual([1000n, 3000n])
+    await expectAssertionError(
+      test(1000n, 3000n, 500n, 3000n, 500n, 2000n),
+      contractInfo.address,
+      ErrorCodes.InsufficientToken1Amount
+    )
+    expect(await test(1000n, 3000n, 500n, 3000n, 500n, 1500n)).toEqual([500n, 1500n])
+    expect(await test(1000n, 3000n, 500n, 3000n, 500n, 1000n)).toEqual([500n, 1500n])
+    await expectAssertionError(
+      test(1000n, 3000n, 1000n, 2000n, 800n, 2000n),
+      contractInfo.address,
+      ErrorCodes.InsufficientToken0Amount
+    )
+    expect(await test(1000n, 3000n, 1000n, 2000n, 500n, 2000n)).toEqual([666n, 2000n])
+    expect(await test(1000n, 3000n, 1000n, 2000n, 500n, 1000n)).toEqual([666n, 2000n])
+  }, 20000)
+
+  test('addLiquidity', async () => {
+    await buildProject()
+
+    const sender = randomP2PKHAddress()
+    const routerContractInfo = createRouter()
+
+    async function testAddLiquidity(
+      tokenPairState: ContractState,
+      amount0Desired: bigint,
+      amount1Desired: bigint,
+      amount0Min: bigint,
+      amount1Min: bigint,
+      deadline: bigint
+    ) {
+      return routerContractInfo.contract.testPublicMethod('addLiquidity', {
+        address: routerContractInfo.address,
+        initialFields: routerContractInfo.selfState.fields,
+        testArgs: {
+          tokenPair: tokenPairState.contractId,
+          sender: sender,
+          amount0Desired: amount0Desired,
+          amount1Desired: amount1Desired,
+          amount0Min: amount0Min,
+          amount1Min: amount1Min,
+          deadline: deadline
+        },
+        existingContracts: routerContractInfo.states().concat([tokenPairState]),
+        inputAssets: [
+          {
+            address: sender,
+            asset: {
+              alphAmount: oneAlph,
+              tokens: [
+                { id: token0Id, amount: amount0Desired },
+                { id: token1Id, amount: amount1Desired }
+              ]
+            }
+          }
+        ]
+      })
+    }
+
+    const [token0Id, token1Id] = randomTokenPair()
+    const tokenPairContractInfo = createTokenPair(token0Id, token1Id)
+    const { contractState } = await mint(tokenPairContractInfo, sender, 1000n, 30000n)
+    const now = Date.now()
+
+    await expectAssertionError(
+      testAddLiquidity(contractState, 500n, 15000n, 500n, 15000n, BigInt(now - 60000)),
+      routerContractInfo.address,
+      ErrorCodes.Expired
+    )
+    const result = await testAddLiquidity(contractState, 500n, 15000n, 500n, 15000n, BigInt(now + 60000))
+    const tokenPairState = result.contracts.find((c) => c.contractId === tokenPairContractInfo.contractId)!
+    expect(tokenPairState.fields['reserve0']).toEqual(1500n)
+    expect(tokenPairState.fields['reserve1']).toEqual(45000n)
+    expect(tokenPairState.fields['totalSupply']).toEqual(8215n)
+    expect(result.returns).toEqual([500n, 15000n, 2738n])
+    const assetOutput = result.txOutputs.find((c) => c.address === sender)!
+    expect(assetOutput.tokens!.length).toEqual(1)
+    expect(assetOutput.tokens![0]).toEqual({ id: tokenPairContractInfo.contractId, amount: 2738n })
+  })
+
+  test('removeLiquidity', async () => {
+    await buildProject()
+
+    const sender = randomP2PKHAddress()
+    const routerContractInfo = createRouter()
+
+    async function testRemoveLiquidity(
+      tokenPairState: ContractState,
+      liquidity: bigint,
+      amount0Min: bigint,
+      amount1Min: bigint,
+      deadline: bigint
+    ) {
+      return routerContractInfo.contract.testPublicMethod('removeLiquidity', {
+        address: routerContractInfo.address,
+        initialFields: routerContractInfo.selfState.fields,
+        testArgs: {
+          tokenPairId: tokenPairState.contractId,
+          sender: sender,
+          liquidity: liquidity,
+          amount0Min: amount0Min,
+          amount1Min: amount1Min,
+          deadline: deadline
+        },
+        existingContracts: routerContractInfo.states().concat([tokenPairState]),
+        inputAssets: [
+          {
+            address: sender,
+            asset: {
+              alphAmount: oneAlph,
+              tokens: [{ id: tokenPairState.contractId, amount: liquidity }]
+            }
+          }
+        ]
+      })
+    }
+
+    const [token0Id, token1Id] = randomTokenPair()
+    const tokenPairContractInfo = createTokenPair(token0Id, token1Id)
+    const { contractState } = await mint(tokenPairContractInfo, sender, 1000n, 30000n)
+    const now = Date.now()
+
+    await expectAssertionError(
+      testRemoveLiquidity(contractState, 2738n, 0n, 0n, BigInt(now - 60000)),
+      routerContractInfo.address,
+      ErrorCodes.Expired
+    )
+    const result = await testRemoveLiquidity(contractState, 2738n, 499n, 14997n, BigInt(now + 60000))
+    const tokenPairState = result.contracts.find((c) => c.contractId === tokenPairContractInfo.contractId)!
+    expect(tokenPairState.fields['reserve0']).toEqual(501n)
+    expect(tokenPairState.fields['reserve1']).toEqual(15003n)
+    expect(tokenPairState.fields['totalSupply']).toEqual(2739n)
+    expect(result.returns).toEqual([499n, 14997n])
+    const assetOutput = result.txOutputs.find((c) => c.address === sender)!
+    expect(assetOutput.tokens!.length).toEqual(2)
+    expectTokensEqual(assetOutput.tokens!, [
+      { id: token0Id, amount: 499n },
+      { id: token1Id, amount: 14997n }
+    ])
+
+    await expectAssertionError(
+      testRemoveLiquidity(contractState, 2738n, 500n, 14997n, BigInt(now + 60000)),
+      routerContractInfo.address,
+      ErrorCodes.InsufficientToken0Amount
+    )
+    await expectAssertionError(
+      testRemoveLiquidity(contractState, 2738n, 499n, 14998n, BigInt(now + 60000)),
+      routerContractInfo.address,
+      ErrorCodes.InsufficientToken1Amount
+    )
+  })
+
+  test('getReserveInAndReserveOut', async () => {
+    await buildProject()
+
+    const sender = randomP2PKHAddress()
+    const routerContractInfo = createRouter()
+    const [token0Id, token1Id] = randomTokenPair()
+    const tokenPairContractInfo = createTokenPair(token0Id, token1Id)
+    const { contractState } = await mint(tokenPairContractInfo, sender, 1000n, 30000n)
+
+    async function testGetReserveInAndReserveOut(tokenPairState: ContractState, tokenInId: string) {
+      return routerContractInfo.contract.testPrivateMethod('getReserveInAndReserveOut', {
+        address: routerContractInfo.address,
+        initialFields: routerContractInfo.selfState.fields,
+        testArgs: {
+          tokenPair: tokenPairState.contractId,
+          tokenInId: tokenInId
+        },
+        existingContracts: routerContractInfo.dependencies.concat([tokenPairState])
+      })
+    }
+
+    const result0 = await testGetReserveInAndReserveOut(contractState, token0Id)
+    expect(result0.returns).toEqual([1000n, 30000n])
+    const result1 = await testGetReserveInAndReserveOut(contractState, token1Id)
+    expect(result1.returns).toEqual([30000n, 1000n])
+  })
+
+  test('swapExactTokenForToken', async () => {
+    await buildProject()
+
+    const sender = randomP2PKHAddress()
+    const routerContractInfo = createRouter()
+
+    async function testSwapExactTokenForToken(
+      tokenPairState: ContractState,
+      tokenInId: string,
+      amountIn: bigint,
+      amountOutMin: bigint,
+      deadline: bigint
+    ) {
+      return routerContractInfo.contract.testPublicMethod('swapExactTokenForToken', {
+        address: routerContractInfo.address,
+        initialFields: routerContractInfo.selfState.fields,
+        testArgs: {
+          tokenPair: tokenPairState.contractId,
+          sender: sender,
+          tokenInId: tokenInId,
+          amountIn: amountIn,
+          amountOutMin: amountOutMin,
+          deadline: deadline
+        },
+        existingContracts: routerContractInfo.dependencies.concat([tokenPairState]),
+        inputAssets: [
+          {
+            address: sender,
+            asset: {
+              alphAmount: oneAlph,
+              tokens: [{ id: tokenInId, amount: amountIn }]
+            }
+          }
+        ]
+      })
+    }
+
+    const [token0Id, token1Id] = randomTokenPair()
+    const tokenPairContractInfo = createTokenPair(token0Id, token1Id)
+    const { contractState } = await mint(tokenPairContractInfo, sender, 1000n, 30000n)
+    const now = Date.now()
+
+    await expectAssertionError(
+      testSwapExactTokenForToken(contractState, token1Id, 15000n, 332n, BigInt(now - 60000)),
+      routerContractInfo.address,
+      ErrorCodes.Expired
+    )
+    const result = await testSwapExactTokenForToken(contractState, token1Id, 15000n, 332n, BigInt(now + 60000))
+    const tokenPairState = result.contracts.find((c) => c.contractId === tokenPairContractInfo.contractId)!
+    expect(tokenPairState.fields['reserve0']).toEqual(668n)
+    expect(tokenPairState.fields['reserve1']).toEqual(45000n)
+    expect(tokenPairState.fields['totalSupply']).toEqual(5477n)
+    const assetOutput = result.txOutputs.find((c) => c.address === sender)!
+    expect(assetOutput.tokens!.length).toEqual(1)
+    expectTokensEqual(assetOutput.tokens!, [{ id: token0Id, amount: 332n }])
+
+    await expectAssertionError(
+      testSwapExactTokenForToken(contractState, token1Id, 15000n, 333n, BigInt(now + 60000)),
+      routerContractInfo.address,
+      ErrorCodes.InsufficientOutputAmount
+    )
+  })
+
+  test('swapTokenForExactToken', async () => {
+    await buildProject()
+
+    const sender = randomP2PKHAddress()
+    const routerContractInfo = createRouter()
+
+    async function testSwapTokenForExactToken(
+      tokenPairState: ContractState,
+      tokenInId: string,
+      amountInMax: bigint,
+      amountOut: bigint,
+      deadline: bigint
+    ) {
+      return routerContractInfo.contract.testPublicMethod('swapTokenForExactToken', {
+        address: routerContractInfo.address,
+        initialFields: routerContractInfo.selfState.fields,
+        testArgs: {
+          tokenPair: tokenPairState.contractId,
+          sender: sender,
+          tokenInId: tokenInId,
+          amountInMax: amountInMax,
+          amountOut: amountOut,
+          deadline: deadline
+        },
+        existingContracts: routerContractInfo.dependencies.concat([tokenPairState]),
+        inputAssets: [
+          {
+            address: sender,
+            asset: {
+              alphAmount: oneAlph,
+              tokens: [{ id: tokenInId, amount: amountInMax }]
+            }
+          }
+        ]
+      })
+    }
+
+    const [token0Id, token1Id] = randomTokenPair()
+    const tokenPairContractInfo = createTokenPair(token0Id, token1Id)
+    const { contractState } = await mint(tokenPairContractInfo, sender, 1000n, 30000n)
+    const now = Date.now()
+
+    await expectAssertionError(
+      testSwapTokenForExactToken(contractState, token0Id, 1004n, 15000n, BigInt(now - 60000)),
+      routerContractInfo.address,
+      ErrorCodes.Expired
+    )
+    const result = await testSwapTokenForExactToken(contractState, token0Id, 1004n, 15000n, BigInt(now + 60000))
+    const tokenPairState = result.contracts.find((c) => c.contractId === tokenPairContractInfo.contractId)!
+    expect(tokenPairState.fields['reserve0']).toEqual(2004n)
+    expect(tokenPairState.fields['reserve1']).toEqual(15000n)
+    expect(tokenPairState.fields['totalSupply']).toEqual(5477n)
+    const assetOutput = result.txOutputs.find((c) => c.address === sender)!
+    expect(assetOutput.tokens!.length).toEqual(1)
+    expectTokensEqual(assetOutput.tokens!, [{ id: token1Id, amount: 15000n }])
+
+    await expectAssertionError(
+      testSwapTokenForExactToken(contractState, token0Id, 1003n, 15000n, BigInt(now + 60000)),
+      routerContractInfo.address,
+      ErrorCodes.InsufficientInputAmount
+    )
+  })
+})

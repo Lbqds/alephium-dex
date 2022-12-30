@@ -1,15 +1,13 @@
-import { Token, web3 } from '@alephium/web3'
+import { Token, web3, subContractId, ALPH_TOKEN_ID } from '@alephium/web3'
 import { expectAssertionError } from '@alephium/web3-test'
 import {
-  alphTokenId,
   buildProject,
   createTokenPairFactory,
   ErrorCodes,
   oneAlph,
   randomP2PKHAddress,
   randomTokenPair,
-  sortTokens,
-  subContractIdWithGroup
+  sortTokens
 } from './fixtures/DexFixture'
 
 describe('test token pair factory', () => {
@@ -49,7 +47,7 @@ describe('test token pair factory', () => {
       })
 
       const [token0Id, token1Id] = sortTokens(tokenAId, tokenBId)
-      const pairContractId = subContractIdWithGroup(contractInfo.contractId, token0Id + token1Id, 0)
+      const pairContractId = subContractId(contractInfo.contractId, token0Id + token1Id, 0)
       const pairContract = testResult.contracts.find((c) => c.contractId === pairContractId)!
       expect(pairContract.fields).toEqual({
         token0Id: token0Id,
@@ -76,8 +74,8 @@ describe('test token pair factory', () => {
 
     await test(token0Id, token1Id)
     await test(token1Id, token0Id)
-    await test(alphTokenId, token1Id, [{ id: token1Id, amount: 1n }])
-    await test(token1Id, alphTokenId, [{ id: token1Id, amount: 1n }])
+    await test(ALPH_TOKEN_ID, token1Id, [{ id: token1Id, amount: 1n }])
+    await test(token1Id, ALPH_TOKEN_ID, [{ id: token1Id, amount: 1n }])
 
     await expectAssertionError(
       test(token0Id, token1Id, [
