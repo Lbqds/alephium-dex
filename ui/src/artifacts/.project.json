@@ -5,7 +5,7 @@
     "ignoreUnusedFieldsWarnings": false,
     "ignoreUnusedPrivateFunctionsWarnings": false,
     "ignoreUpdateFieldsCheckWarnings": false,
-    "ignoreExternalCallCheckWarnings": false
+    "ignoreCheckExternalCallerWarnings": false
   },
   "infos": {
     "contracts/dex/router.ral": {
@@ -15,7 +15,7 @@
       "warnings": []
     },
     "contracts/dex/token_pair.ral": {
-      "sourceCodeHash": "90c064dbca4d4dc284b048f3fbb3743e915fe68d371ac48eb160fb3587466ed3",
+      "sourceCodeHash": "93545405ec78ed2ef556ef32bf95e3ef465e5bcc465ec482041f6424870fb7df",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "c3a236450cadd2b6785cea64133501575e9fcc268ed3d117c0b913c54efcbec4",
       "warnings": []

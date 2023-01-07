@@ -15,12 +15,10 @@ Contract TokenPair(
 
   const MINIMUM_LIQUIDITY = 1000
 
-  @using(externalCallCheck = false)
   pub fn getTokenPair() -> (ByteVec, ByteVec) {
     return token0Id, token1Id
   }
 
-  @using(externalCallCheck = false)
   pub fn getReserves() -> (U256, U256) {
     return reserve0, reserve1
   }
@@ -43,7 +41,7 @@ Contract TokenPair(
     blockTimeStampLast = blockTimeStampSecond
   }
 
-  @using(preapprovedAssets = true, assetsInContract = true, updateFields = true, externalCallCheck = false)
+  @using(preapprovedAssets = true, assetsInContract = true, updateFields = true, checkExternalCaller = false)
   pub fn mint(sender: Address, amount0: U256, amount1: U256) -> U256 {
     let mut liquidity = 0
     if (totalSupply == 0) {
@@ -71,7 +69,7 @@ Contract TokenPair(
     return liquidity
   }
 
-  @using(preapprovedAssets = true, assetsInContract = true, updateFields = true, externalCallCheck = false)
+  @using(preapprovedAssets = true, assetsInContract = true, updateFields = true, checkExternalCaller = false)
   pub fn burn(sender: Address, liquidity: U256) -> (U256, U256) {
     let amount0 = liquidity * reserve0 / totalSupply
     let amount1 = liquidity * reserve1 / totalSupply
@@ -88,7 +86,7 @@ Contract TokenPair(
     return amount0, amount1
   }
 
-  @using(preapprovedAssets = true, assetsInContract = true, externalCallCheck = false)
+  @using(preapprovedAssets = true, assetsInContract = true, checkExternalCaller = false)
   pub fn swap(sender: Address, tokenInId: ByteVec, amountIn: U256, amountOut: U256) -> () {
     assert!(isAssetAddress!(sender), ErrorCodes.InvalidToAddress)
     assert!(amountOut > 0, ErrorCodes.InsufficientOutputAmount)

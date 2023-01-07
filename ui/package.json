@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@alephium/walletconnect-provider": "0.2.0",
-    "@alephium/web3": "0.3.0-rc.0",
+    "@alephium/web3": "0.3.0-rc.3",
     "@alephium/get-extension-wallet": "0.4.0-rc.1",
     "@walletconnect/signer-connection": "2.0.0-rc.3",
     "@walletconnect/qrcode-modal": "1.8.0",
